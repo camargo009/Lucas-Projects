@@ -475,7 +475,7 @@ def identidade_lateral(u) -> None:
         '<div class="sidebar-brand"><div class="brand-line">'
         '<div class="brand-symbol" aria-hidden="true">+</div>'
         '<div class="brand-name">Mais<br>Especialistas<span>ATEM / PROADI-SUS</span></div></div>'
-        '<div class="brand-description">Cuidado que conecta.<br>Acompanhamento que transforma.</div></div>'
+        '<div class="brand-description">Acompanhamento que transforma.</div></div>'
         '<div class="sidebar-account">'
         f'<div class="sidebar-avatar" aria-hidden="true">{html.escape(iniciais)}</div>'
         f'<div class="sidebar-user">{html.escape(u.nome)}<div class="sidebar-role">{perfil} · HAOC</div>'
