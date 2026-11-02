@@ -4,6 +4,7 @@ from __future__ import annotations
 import html
 import math
 import os
+from dataclasses import fields
 
 import pandas as pd
 import plotly.express as px
@@ -15,6 +16,7 @@ from atem import curso as cs
 from atem.agrupamento import ESTADOS, centros_estados, contornos_estados
 from atem.auth import autenticar, carregar_usuarios, dados_visiveis
 from atem.datasource import criar_fonte
+from atem.models import Dataset
 from atem.supabase_auth import AuthError, SessionExpired, criar_auth
 
 st.set_page_config(page_title="Mais Especialistas", page_icon="🩺", layout="wide")
@@ -37,7 +39,9 @@ def _fonte():
 @st.cache_data(ttl=60, show_spinner=False)
 def carregar_dados():
     """Dados da fonte (Excel/REDCap) + hora da consulta; o cache curto mantém o painel quase em tempo real."""
-    return _fonte().load(), pd.Timestamp.now()
+    ds = _fonte().load()
+    # Classes da aplicação podem ser recarregadas enquanto a fonte permanece em cache.
+    return {f.name: getattr(ds, f.name) for f in fields(Dataset)}, pd.Timestamp.now()
 
 
 def carregar_com_aviso():
@@ -76,7 +80,8 @@ def carregar_com_aviso():
 </div>
 """, unsafe_allow_html=True)
     try:
-        return carregar_dados()
+        tabelas, atualizado = carregar_dados()
+        return Dataset(**tabelas), atualizado
     finally:
         aviso.empty()
 

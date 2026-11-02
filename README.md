@@ -84,6 +84,8 @@ Não há fallback para dados locais: ausência de arquivos, falha na API ou form
 gera erro visível. Os arquivos são baixados em diretório temporário e removidos após o
 processamento, inclusive em caso de erro; os dados interpretados ficam no cache do painel
 por até 60 segundos. O botão **Atualizar dados** limpa o cache e consulta novamente.
+O cache guarda somente as tabelas e o horário da consulta; o `Dataset` é reconstruído
+fora dele, sem compartilhar objetos mutáveis entre sessões.
 O cache expira, mas não atualiza sozinho uma tela ociosa: a próxima interação ou o botão
 consulta a fonte. Ao alterar a configuração, reinicie o Streamlit.
 
