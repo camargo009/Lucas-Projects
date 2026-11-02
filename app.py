@@ -242,11 +242,40 @@ PALETA = ["#14A3B3", "#F4A259", "#7BC9A6", "#E0626B", "#9B8CE0"]
 CSS = """
 <style>
 .block-container {padding-top: 2rem;}
-.banner {background: linear-gradient(120deg, #0E7C86 0%, #1F3A5F 100%); color: #fff;
-  border-radius: 16px; padding: 22px 28px; margin-bottom: 18px;}
-.banner h1 {font-size: 1.7rem; margin: 0 0 6px 0; padding: 0; color: #fff;}
+.banner {position: relative; overflow: hidden; background: radial-gradient(ellipse at 100% 0%, rgba(74,203,191,.22), transparent 55%),
+  linear-gradient(115deg, #102D46, #125B6B 70%, #137D85); color: #fff;
+  border: 1px solid rgba(127,227,238,.22); border-radius: 24px; padding: 26px 30px; margin-bottom: 18px;
+  box-shadow: 0 12px 32px rgba(10,42,60,.16);}
+.banner::after {content: ""; position: absolute; width: 230px; height: 230px; border-radius: 50%;
+  border: 32px solid rgba(255,255,255,.035); right: -80px; bottom: -155px; pointer-events: none;}
+.brand-line {display: flex; align-items: center; gap: 12px; margin-bottom: 23px;}
+.brand-symbol {display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  width: 44px; height: 44px; border-radius: 14px; color: #E5FFFF !important; font-size: 29px;
+  font-weight: 400; background: linear-gradient(145deg, #20ACB5, #117A8A); border: 1px solid rgba(255,255,255,.25);
+  box-shadow: 0 4px 14px rgba(0,0,0,.12);}
+.brand-name {font-size: 1.1rem; font-weight: 750; line-height: 1.15; letter-spacing: -.025em;}
+.brand-name span {display: block; font-size: .64rem; font-weight: 500; text-transform: uppercase;
+  letter-spacing: .16em; margin-top: 6px; opacity: .8;}
+.brand-partners {margin-left: auto; font-size: .68rem; letter-spacing: .12em; opacity: .85; text-align: right;}
+.banner h1 {font-size: clamp(1.35rem, 3vw, 2rem); font-weight: 750; letter-spacing: -.035em;
+  margin: 0 0 8px; padding: 0; color: #fff; overflow-wrap: anywhere;}
+.stApp .banner h1, .banner .brand-name, .banner .brand-name span, .banner .brand-partners, .banner .chip {color: #fff !important;
+  -webkit-text-fill-color: #fff !important;}
 .banner .chip {display: inline-block; background: rgba(255,255,255,.18); border-radius: 999px;
   padding: 3px 12px; margin: 4px 6px 0 0; font-size: .82rem;}
+.sidebar-brand {padding: 8px 0 23px; border-bottom: 1px solid rgba(128,128,128,.2); margin-bottom: 18px;}
+.sidebar-brand .brand-line {margin-bottom: 0;}
+.sidebar-brand .brand-name {font-size: 1.15rem;}
+.sidebar-brand .brand-name span {font-size: .6rem;}
+.sidebar-brand .brand-description {font-size: .76rem; line-height: 1.6; opacity: .7; margin-top: 16px;}
+.sidebar-account {display: flex; align-items: center; gap: 12px; padding: 15px 12px; margin-bottom: 10px;
+  border: 1px solid rgba(20,163,179,.23); border-radius: 16px; background: rgba(20,163,179,.08);}
+.sidebar-avatar {display: flex; align-items: center; justify-content: center; width: 38px; height: 38px;
+  flex-shrink: 0; border-radius: 50%; background: #136E7A; color: #fff !important; font-size: .8rem; font-weight: 700;}
+.sidebar-user {font-weight: 650; font-size: .88rem; line-height: 1.4; overflow-wrap: anywhere; min-width: 0;}
+.sidebar-role {font-size: .7rem; opacity: .7; margin-top: 3px; font-weight: 400;}
+[data-testid="stSidebar"] [data-testid="stButton"] button {width: 100%; border-radius: 12px; min-height: 42px;}
+.sidebar-update {font-size: .72rem; opacity: .65; margin-top: 4px; padding-left: 3px;}
 .kcard {border-radius: 14px; padding: 16px 18px; border: 1px solid rgba(128,128,128,.25);
   background: rgba(128,128,128,.08); border-left: 6px solid var(--c);}
 .kcard.hero {padding: 26px 30px;}
@@ -279,8 +308,10 @@ CSS = """
 [data-baseweb="tag"] span, [data-baseweb="tag"] svg {color: #BFEFF4 !important; fill: #BFEFF4 !important;
   -webkit-text-fill-color: #BFEFF4 !important;}
 @media (max-width: 768px) {
-  .block-container {padding: 1rem .8rem 3rem !important;}
+  .block-container {padding: 4.5rem .8rem 3rem !important;}
   .banner {padding: 16px 18px;} .banner h1 {font-size: 1.3rem;}
+  .brand-line {flex-wrap: wrap; margin-bottom: 18px;}
+  .brand-partners {margin-left: 0; width: 100%; text-align: left; font-size: .6rem;}
   .kcard.hero {padding: 18px 20px;} .kcard.hero .vl {font-size: 2.6rem;}
   .kcard .vl {font-size: 1.6rem;}
   .idgrid {grid-template-columns: 1fr 1fr; gap: 10px;}
@@ -428,8 +459,27 @@ def grafico(fig, **kw) -> None:
 
 
 def cabecalho(titulo: str, partes: list[str]) -> None:
-    chips = "".join(f'<span class="chip">{p}</span>' for p in partes if p)
-    st.markdown(f'<div class="banner"><h1>{titulo}</h1>{chips}</div>', unsafe_allow_html=True)
+    chips = "".join(f'<span class="chip">{html.escape(str(p))}</span>' for p in partes if p)
+    st.markdown(
+        '<div class="banner"><div class="brand-line">'
+        '<div class="brand-symbol" aria-hidden="true">+</div>'
+        '<div class="brand-name">Mais Especialistas<span>Painel de acompanhamento</span></div>'
+        '<div class="brand-partners">ATEM / PROADI-SUS<br>HAOC</div></div>'
+        f'<h1>{html.escape(titulo)}</h1>{chips}</div>', unsafe_allow_html=True)
+
+
+def identidade_lateral(u) -> None:
+    iniciais = "".join(p[0] for p in u.nome.split()[:2]).upper()
+    perfil = "Supervisor" if u.eh_supervisor else "Especialista"
+    st.sidebar.markdown(
+        '<div class="sidebar-brand"><div class="brand-line">'
+        '<div class="brand-symbol" aria-hidden="true">+</div>'
+        '<div class="brand-name">Mais<br>Especialistas<span>ATEM / PROADI-SUS</span></div></div>'
+        '<div class="brand-description">Cuidado que conecta.<br>Acompanhamento que transforma.</div></div>'
+        '<div class="sidebar-account">'
+        f'<div class="sidebar-avatar" aria-hidden="true">{html.escape(iniciais)}</div>'
+        f'<div class="sidebar-user">{html.escape(u.nome)}<div class="sidebar-role">{perfil} · HAOC</div>'
+        '</div></div>', unsafe_allow_html=True)
 
 
 def cartoes(k: dict, destaque: bool = False) -> None:
@@ -1099,11 +1149,10 @@ def main() -> None:
     if u is None:
         tela_login()
         return
-    st.sidebar.write(f"👤 {u.nome}")
+    identidade_lateral(u)
     px.defaults.color_discrete_sequence = PALETA
     st.sidebar.toggle("🌙 Modo escuro", value=True, key="escuro")
     st.markdown(CSS + css_tema(), unsafe_allow_html=True)
-    st.sidebar.caption("Supervisor" if u.eh_supervisor else "Especialista")
     if st.sidebar.button("Sair"):
         session = st.session_state.pop("auth_session", None)
         st.session_state.pop("usuario", None)
@@ -1122,7 +1171,8 @@ def main() -> None:
         _fonte.clear()
         carregar_dados.clear()
         st.rerun()
-    st.sidebar.caption(f"Atualizado às {atualizado:%H:%M:%S}")
+    st.sidebar.markdown(f'<div class="sidebar-update">Dados consultados às {atualizado:%H:%M:%S}</div>',
+                        unsafe_allow_html=True)
     (pagina_supervisor if u.eh_supervisor else pagina_especialista)(u, ds)
 
 

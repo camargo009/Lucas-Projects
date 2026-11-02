@@ -1,5 +1,9 @@
 # Painel Projeto Mais Especialistas (ATEM/PROADI-SUS, HAOC)
 
+O cabeçalho e a lateral utilizam identidade tipográfica própria, sem reproduzir um
+logotipo oficial. O layout se adapta ao celular e aos modos claro e escuro, com
+identificação do usuário, perfil de acesso e horário da consulta na lateral.
+
 Painel em **Python + Streamlit + Plotly**, em português, para acompanhar consultas e procedimentos dos especialistas.
 
 - **Especialista**: login por e-mail/senha; vê somente os próprios dados (KPIs, evolução mensal/semanal, top procedimentos e CIDs, dificuldade, mentorias, posição opcional no ranking).

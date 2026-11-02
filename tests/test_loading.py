@@ -21,9 +21,13 @@ def test_carregamento_remove_popup_apos_sucesso_ou_erro(monkeypatch, fail):
     monkeypatch.setattr("atem.datasource.criar_fonte", lambda get: Source())
     at = AppTest.from_file(Path(__file__).resolve().parents[1] / "app.py", default_timeout=120)
     at.secrets["AUTH_PROVIDER"] = "local"
-    at.session_state["usuario"] = Usuario("test@example.org", "Teste", "especialista", "onco-1")
+    at.session_state["usuario"] = Usuario("test@example.org", "Teste <perfil>", "especialista", "onco-1")
     at.run()
     assert not at.exception
+    lateral = "\n".join(m.value for m in at.sidebar.markdown)
+    assert 'class="sidebar-brand"' in lateral
+    assert "Teste &lt;perfil&gt;" in lateral
+    assert "Especialista · HAOC" in lateral
     assert not any('class="atem-carregamento"' in m.value for m in at.markdown)
     if fail:
         assert any("Falha de consulta de teste" in e.value for e in at.error)
