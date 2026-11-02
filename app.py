@@ -34,10 +34,51 @@ def _fonte():
     return criar_fonte(cfg)
 
 
-@st.cache_data(ttl=60, show_spinner="Carregando dados...")
+@st.cache_data(ttl=60, show_spinner=False)
 def carregar_dados():
     """Dados da fonte (Excel/REDCap) + hora da consulta; o cache curto mantém o painel quase em tempo real."""
     return _fonte().load(), pd.Timestamp.now()
+
+
+def carregar_com_aviso():
+    aviso = st.empty()
+    aviso.markdown("""
+<style>
+.atem-carregamento {
+  position: fixed; inset: 0; z-index: 999990;
+  display: flex; align-items: center; justify-content: center;
+  padding: 20px; background: rgba(11,18,32,.55); backdrop-filter: blur(5px);
+}
+.atem-carregamento-card {
+  width: min(100%, 380px); box-sizing: border-box; padding: 32px 24px;
+  border-radius: 24px; text-align: center; color: #E6EDF5;
+  background: #142337; border: 1px solid rgba(127,227,238,.25);
+  box-shadow: 0 24px 80px rgba(0,0,0,.3);
+}
+.atem-carregamento-card h2 {
+  color: #E6EDF5 !important; font-size: 1.2rem; padding: 0; margin: 20px 0 8px;
+}
+.atem-carregamento-card p {color: #C0CFDF !important; font-size: .95rem; margin: 0;}
+.atem-carregamento-anel {
+  width: 42px; height: 42px; margin: auto; border-radius: 50%;
+  border: 4px solid rgba(127,227,238,.18); border-top-color: #7FE3EE;
+  animation: atem-girar .9s linear infinite;
+}
+@keyframes atem-girar {to {transform: rotate(360deg);}}
+@media (prefers-reduced-motion: reduce) {.atem-carregamento-anel {animation: none;}}
+</style>
+<div class="atem-carregamento" role="status" aria-live="polite">
+  <div class="atem-carregamento-card">
+    <div class="atem-carregamento-anel" aria-hidden="true"></div>
+    <h2>Carregando seus dados</h2>
+    <p>Estamos preparando o painel. Aguarde um momento.</p>
+  </div>
+</div>
+""", unsafe_allow_html=True)
+    try:
+        return carregar_dados()
+    finally:
+        aviso.empty()
 
 
 @st.cache_data(ttl=30)
@@ -1068,7 +1109,7 @@ def main() -> None:
                 st.session_state["aviso_logout"] = "Você saiu deste painel, mas não foi possível encerrar a sessão remota."
         st.rerun()
     try:
-        ds, atualizado = carregar_dados()
+        ds, atualizado = carregar_com_aviso()
     except Exception as exc:
         st.error(f"Não foi possível carregar os dados: {exc}")
         return
