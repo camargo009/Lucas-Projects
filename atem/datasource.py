@@ -198,8 +198,15 @@ class RedcapFilesSource(DataSource):
         except requests.RequestException:
             raise RuntimeError("Não foi possível conectar ao REDCap. Verifique a rede e a URL da API.") from None
         if response.status_code != 200:
+            operation = {"metadata": "metadados", "record": "registros", "file": "arquivos"}.get(content, "dados")
+            media_type = response.headers.get("Content-Type", "").lower()
+            response_format = ("HTML" if "text/html" in media_type else
+                               "JSON" if "json" in media_type else "outro")
             raise RuntimeError(f"O REDCap recusou a consulta (HTTP {response.status_code}). "
-                               "Verifique a URL, o token e as permissões de exportação.")
+                               f"Operação: exportar {operation}; formato da resposta: {response_format}. "
+                               "Verifique a URL, o token e as permissões de exportação. "
+                               "Se o mesmo acesso funciona localmente, peça à TI para verificar "
+                               "restrições de rede ou firewall para a hospedagem.")
         return response
 
     def _json(self, content: str, **params) -> list[dict]:

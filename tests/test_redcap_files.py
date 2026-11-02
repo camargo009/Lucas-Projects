@@ -154,6 +154,20 @@ def test_factory_e_https():
         RedcapFilesSource("http://redcap.example.org/api/", "test-only")
 
 
+@pytest.mark.parametrize("media_type,label", [("text/html", "HTML"), ("application/json", "JSON"), ("", "outro")])
+def test_diagnostico_recusa_sem_corpo_ou_token(media_type, label):
+    reply = Reply(content=b"private response with secret", status=403)
+    reply.headers["Content-Type"] = media_type
+    src = RedcapFilesSource("https://redcap.example.org/api/", "private-token",
+                            post=lambda *a, **k: reply)
+    with pytest.raises(RuntimeError) as exc:
+        src.load()
+    message = str(exc.value)
+    assert "exportar metadados" in message
+    assert f"resposta: {label}" in message
+    assert "private" not in message and "secret" not in message
+
+
 @pytest.mark.parametrize("missing", [False, True])
 def test_campos_separados_todas_abas_e_isolamento(uploads, missing):
     fields = {"curso_especialistas_onco": "Oncologia",
