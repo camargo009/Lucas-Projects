@@ -25,8 +25,8 @@ Acesse http://localhost:8080. Senha de todas as contas: `telessaude`
 
 | Perfil | Conta | Papel |
 |---|---|---|
-| Médico | medico@ (Dr. Henrique Matos, HRAN) | Atende o paciente, abre a solicitação, conversa com o teleconsultor |
-| Teleconsultor | teleconsultor@ (Dra. Beatriz Nogueira, Cardiologia) | Responde por chat assíncrono ou vídeo, emite e assina o parecer |
+| Médico | medico@ (Dr. Henrique Matos, HRAN) | Solicita o teleparecer (Fluxo 1, passos 1 a 9), anexa informações pedidas |
+| Teleconsultor | teleconsultor@ (Dra. Beatriz Nogueira, Cardiologia) | Analisa (passo 10), decide nos passos 11 a 13, atende o paciente na sala, emite e assina o parecer |
 | Gestor / Administrador | gestor@ (Marina Duarte) | Cadastros, agenda, auditoria, integrações, suporte |
 
 ## Módulos (conforme documento FEPECS)
@@ -35,10 +35,10 @@ Teleconsultoria/Teleparecer (Fluxo 1 completo), Telereuniões, Telediagnóstico 
 Interface PEC e-SUS (FHIR Bundle simulado), Assinatura eletrônica (verificação por QR).
 
 ## Roteiro sugerido
-1. Médico → **Nova solicitação** → percorre o Fluxo 1 (assíncrono = chat/texto) → envia.
-2. Teleconsultor → assume → **conversa por texto** no caso (consulta assíncrona) → solicita informação → médico responde.
-3. Agendar teleparecer → **Entrar na sala**. O dev remoto abre a URL pública e
-   entra como Henrique; o paciente entra pelo link/QR do caso (sem login).
+1. Médico → **Nova solicitação** → responde o Fluxo 1 (passo 5 "Sim" = assíncrono, formulário com resposta em até 48 h) → envia.
+2. Teleconsultor → assume (passo 10) → passo 11: **Sim** emite o parecer; **Não** abre o passo 13 com as 4 opções (mais informações, teleatendimento síncrono, fluxo hospitalar, evoluir no prontuário).
+3. Caminho presencial no hospital: no passo 6 "Sim" o médico agenda a teleconsulta; o teleconsultor atende o paciente na sala **sem o médico**, com enfermagem ajudando (link/QR do caso).
+   Para vídeo remoto, o dev abre a URL pública como Beatriz.
 4. Beatriz emite parecer (use o rascunho do Copiloto), assina, envia ao PEC e encerra.
 5. Mostrar documento impresso e a verificação pelo QR.
 6. Telediagnóstico: teleconsultor lauda a espirometria. Gestor → Auditoria.

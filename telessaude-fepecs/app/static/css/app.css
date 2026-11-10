@@ -170,6 +170,10 @@ table.t { width: 100%; border-collapse: collapse; }
 .decisao .n { font-family: var(--mono); font-size: 11.5px; color: var(--azul); letter-spacing: .05em; }
 .opt { display: grid; grid-template-columns: 30px 1fr; gap: 10px; padding: 10px 12px; border: 1px solid var(--line); background: #fff; cursor: pointer; margin-bottom: 8px; align-items: start; }
 .opt:hover { border-color: var(--azul); }
+.o13 { display: grid; grid-template-columns: 20px 24px 1fr; gap: 8px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; margin-bottom: 8px; cursor: pointer; align-items: start; }
+.o13:has(input:checked) { border-color: var(--azul); background: var(--azul-claro); }
+.o13 b { font-family: var(--mono); color: var(--azul); }
+.pill-info { background: var(--azul-claro); border-radius: 8px; padding: 9px 12px; margin-bottom: 12px; font-size: 13px; }
 .opt.sel { border-color: var(--azul); background: var(--azul-claro); }
 .opt b { font-family: var(--mono); color: var(--azul); }
 

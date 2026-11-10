@@ -1,6 +1,7 @@
 import { S, api, carregar, conectarWS, sair } from "./api.js";
 import { esc, ic, toast, ini, usr, pac, und, caso, dsh, dt, hm, PERFIL, TIPO, stHtml, priTag, priCls, slaHtml, pageHead, rel, STATUS } from "./ui.js";
 import * as V from "./v-casos.js";
+import { novo } from "./v-novo.js";
 const tabela = V.tabela;
 import * as O from "./v-outros.js";
 import * as R from "./v-sala.js";
@@ -69,7 +70,7 @@ function shell(p) {
   const bc = r.querySelector("#bellc");
   bc.textContent = naoLidas || ""; bc.style.display = naoLidas ? "" : "none";
   const box = r.querySelector(".content");
-  const mod = { painel: painel, novo: V.novo, casos: V.lista, agenda: O.agenda, reunioes: O.reunioes, telediagnostico: O.telediagnostico, suporte: O.suporte, admin: O.admin, integracoes: O.integracoes, fluxo: O.fluxo };
+  const mod = { painel: painel, novo: novo, casos: V.lista, agenda: O.agenda, reunioes: O.reunioes, telediagnostico: O.telediagnostico, suporte: O.suporte, admin: O.admin, integracoes: O.integracoes, fluxo: O.fluxo };
   const fn = p[0] === "casos" && p[1] ? V.detalhe : mod[p[0]];
   if (!fn) { box.innerHTML = pageHead("Página não encontrada"); return; }
   const scroll = box.scrollTop;

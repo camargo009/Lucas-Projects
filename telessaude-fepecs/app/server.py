@@ -62,8 +62,8 @@ def seed():
     patients = [
         dict(id="p1", nome="José Antônio Ferreira", nasc="1951-03-14", sexo="M", cns="700 0000 0000 0001", unidade="u-hran", local="Enfermaria 4B, leito 12"),
         dict(id="p2", nome="Maria das Graças Lima", nasc="1964-09-02", sexo="F", cns="700 0000 0000 0002", unidade="u-hran", local="Enfermaria 3A, leito 7"),
-        dict(id="p3", nome="Ricardo Pires Cunha", nasc="1978-12-21", sexo="M", cns="700 0000 0000 0003", unidade="u-hran", local="Ambulatório"),
-        dict(id="p4", nome="Ana Beatriz Moura", nasc="1992-06-30", sexo="F", cns="700 0000 0000 0004", unidade="u-hran", local="Ambulatório"),
+        dict(id="p3", nome="Ricardo Pires Cunha", nasc="1978-12-21", sexo="M",         cns="700 0000 0000 0003", unidade="u-hran", local="Enfermaria 5C, leito 2"),
+                dict(id="p4", nome="Ana Beatriz Moura", nasc="1992-06-30", sexo="F", cns="700 0000 0000 0004", unidade="u-hran", local="Pronto-socorro, aguardando internação"),
         dict(id="p5", nome="Sebastião Rocha Neto", nasc="1947-01-09", sexo="M", cns="700 0000 0000 0005", unidade="u-hran", local="UTI, leito 3"),
         dict(id="p6", nome="Luciana Barros Gomes", nasc="1985-04-17", sexo="F", cns="700 0000 0000 0006", unidade="u-hran", local="Enfermaria 2A, leito 5"),
     ]
@@ -78,7 +78,7 @@ def seed():
             id=uid("c-"), tipo=tipo, protocolo=f"{TIPOS[tipo]}-2026-{n:04d}", status="aguardando", prioridade="Rotina",
             modalidade="assincrona", hospitalar=True, anexos=[], timeline=[], resposta=None, agendamento=None,
             sala="r-" + secrets.token_hex(5), pec=None, transcricao=[], especialista=None, anamnese="", exame_clinico="",
-            hipotese="", duvida="", queixa="", criado=now(), prazo=None, info_pedida=None, mensagens=[],
+            hipotese="", duvida="", queixa="", criado=now(), prazo=None, info_pedida=None, modo="", situacao="Internado",
         )
         base.update(kw)
         c.append(base)
@@ -92,10 +92,6 @@ def seed():
              criado=now() - 20 * H, prazo=now() + 28 * H)
     a["timeline"] = [ev("u-sol1", "criacao", "Teleparecer solicitado ao serviço de Cardiologia (fluxo assíncrono, prazo de 48 h).", a["criado"])]
 
-    a["mensagens"] = [dict(autor="u-sol1", ts=now() - 19 * H, texto="Bom dia, Dra. Beatriz. Paciente com IC descompensada, resposta parcial à furosemida EV. Posso aumentar a dose ou prefiro associar outro diurético?"),
-                      dict(autor="u-esp1", ts=now() - 17 * H, texto="Bom dia, Henrique. Qual o peso atual versus o peso seco e a creatinina de hoje?"),
-                      dict(autor="u-sol1", ts=now() - 16 * H, texto="Peso 82 kg (seco estimado 74 kg). Creatinina 1,3 e potássio 3,9.")]
-
     b = case("teleparecer", 2, paciente="p2", solicitante="u-sol1", especialista="u-esp1", especialidade="Cardiologia", unidade="u-hran",
              status="info_solicitada", queixa="Dor torácica atípica com troponina limítrofe",
              anamnese="Feminina, 61 anos, hipertensa e dislipidêmica, internada com dor torácica em aperto, de curta duração, sem relação clara com esforço.",
@@ -105,7 +101,6 @@ def seed():
              info_pedida="Enviar o ECG de 12 derivações e a curva de troponina seriada.")
     b["timeline"] = [ev("u-sol1", "criacao", "Teleparecer solicitado.", b["criado"]),
                      ev("u-esp1", "info", "Solicitado mais informações: enviar o ECG de 12 derivações e a curva de troponina seriada.", now() - 6 * H)]
-    b["mensagens"] = [dict(autor="u-esp1", ts=now() - 6 * H, texto="Henrique, preciso do ECG de 12 derivações e da curva de troponina seriada para seguir.")]
 
     d = case("teleparecer", 3, paciente="p5", solicitante="u-sol1", especialista="u-esp1", especialidade="Cardiologia", unidade="u-hran",
              status="respondido", prioridade="Prioritário", queixa="Fibrilação atrial de início recente com resposta ventricular rápida",
@@ -121,7 +116,7 @@ def seed():
     d["pec"] = dict(status="enviado", id="Bundle/" + uid(), ts=now() - 2 * D)
 
     e = case("teleparecer", 4, paciente="p6", solicitante="u-sol1", especialista="u-esp1", especialidade="Cardiologia", unidade="u-hran",
-             status="teleatendimento_agendado", modalidade="sincrona", prioridade="Urgente", queixa="Síncope de repetição",
+             status="teleatendimento_agendado", modalidade="sincrona", modo="a_beira_leito", situacao="Internado", prioridade="Urgente", queixa="Síncope de repetição",
              anamnese="Feminina, 39 anos, dois episódios de síncope em 48 h sem pródromos. Sem cardiopatia conhecida.",
              exame_clinico="PA 110/70, FC 58 bpm, ECG com bloqueio atrioventricular de 1º grau.",
              hipotese="Síncope com suspeita de causa arritmogênica", duvida="Necessidade de monitorização contínua e investigação?",
@@ -130,25 +125,22 @@ def seed():
     e["timeline"] = [ev("u-sol1", "criacao", "Teleparecer solicitado.", e["criado"]),
                      ev("u-esp1", "agenda", "Marcado teleatendimento síncrono com a presença do paciente.", now() - 2 * H)]
 
-    f = case("teleinterconsulta", 5, paciente="p3", solicitante="u-sol1", especialista="u-esp1", especialidade="Cardiologia", unidade="u-hran",
-             hospitalar=False, status="em_analise", queixa="Hipertensão de difícil controle",
+    f = case("teleparecer", 5, paciente="p3", solicitante="u-sol1", especialista="u-esp1", especialidade="Cardiologia", unidade="u-hran",
+             status="em_analise", situacao="Internado", queixa="Hipertensão de difícil controle",
              anamnese="Masculino, 45 anos, HAS há 10 anos, em uso de losartana, anlodipino e hidroclorotiazida em doses plenas, com PA persistentemente acima de 160/100.",
              exame_clinico="PA 164/102, IMC 31, sem edema, ausculta cardíaca normal.", hipotese="Hipertensão resistente",
              duvida="Investigar causas secundárias? Qual o próximo passo terapêutico?", criado=now() - 26 * H, prazo=now() + 22 * H)
-    f["timeline"] = [ev("u-sol1", "criacao", "Teleinterconsulta solicitada.", f["criado"]),
-                     ev("u-esp1", "analise", "Solicitação assumida para análise.", now() - 5 * H)]
+    f["timeline"] = [ev("u-sol1", "criacao", "Teleparecer solicitado (assíncrono, prazo de 48 h).", f["criado"]),
+                     ev("u-esp1", "analise", "Solicitação em análise pelo teleconsultor.", now() - 5 * H)]
 
-    g = case("teletriagem", 6, paciente="p4", solicitante="u-sol1", especialidade="Cardiologia", unidade="u-hran", hospitalar=False,
+    g = case("teleparecer", 6, paciente="p4", solicitante="u-sol1", especialista="u-esp1", especialidade="Cardiologia", unidade="u-hran",
+             status="teleatendimento_agendado", modalidade="sincrona", modo="sala_teleparecer", situacao="Em processo de internação",
              queixa="Palpitações há 3 semanas", anamnese="Feminina, 33 anos, sem comorbidades, palpitações ocasionais em repouso, sem síncope.",
              exame_clinico="Ausculta cardíaca normal, ECG de repouso sem alterações.", hipotese="Extrassístoles benignas?", duvida="Encaminhar para Holter?",
              criado=now() - 4 * H, prazo=now() + 44 * H)
-    g["timeline"] = [ev("u-sol1", "criacao", "Teletriagem solicitada.", g["criado"])]
-
-    h = case("teleconsulta", 7, paciente="p3", solicitante="u-sol1", especialista="u-esp1", especialidade="Cardiologia", unidade="u-hran",
-             hospitalar=False, modalidade="sincrona", status="teleatendimento_agendado", queixa="Retorno de seguimento, hipertensão resistente",
-             anamnese="Retorno após ajuste terapêutico.", criado=now() - 2 * D, prazo=now() + 1 * D)
-    h["agendamento"] = dict(inicio=at(1, 10, 0), fim=at(1, 10, 30), slot="s-seed2")
-    h["timeline"] = [ev("u-sol1", "criacao", "Teleconsulta de retorno agendada.", h["criado"])]
+    g["agendamento"] = dict(inicio=at(1, 10, 0), fim=at(1, 10, 30), slot="s-seed2")
+    g["timeline"] = [ev("u-sol1", "criacao", "Teleparecer solicitado: paciente pode ser deslocado à sala de teleparecer.", g["criado"]),
+                     ev("u-sol1", "agenda", "Agenda de teleconsulta hospitalar solicitada com o especialista.", g["criado"])]
 
     slots = []
     for esp in ("u-esp1",):
@@ -181,7 +173,7 @@ def seed():
     audit = [dict(ts=now() - 3 * H, user="u-sol1", acao="Login", alvo="Sessão", ip="10.0.4.21"),
              dict(ts=now() - 2 * H, user="u-esp1", acao="Agendamento de teleatendimento", alvo=e["protocolo"], ip="10.0.7.8")]
     return dict(users=users, units=units, patients=patients, cases=c, slots=slots, exams=exams, tickets=tickets,
-                meetings=meetings, audit=audit, notifs=[], contador=7)
+                meetings=meetings, audit=audit, notifs=[], contador=6)
 
 
 def save():
@@ -282,8 +274,10 @@ def add_event(c, user, tipo, texto):
 
 async def create_case(request):
     u = auth(request)
+    if u["perfil"] != "solicitante":
+        return jr({"erro": "Somente o médico solicitante abre teleparecer."}, 403)
     b = await request.json()
-    tipo = b.get("tipo", "teleparecer")
+    tipo = "teleparecer"
     DB["contador"] += 1
     pac = b.get("paciente")
     if b.get("novo_paciente"):
@@ -291,30 +285,32 @@ async def create_case(request):
         pac = uid("p-")
         DB["patients"].append(dict(id=pac, nome=np["nome"], nasc=np.get("nasc", ""), sexo=np.get("sexo", "M"), cns=np.get("cns", "—"),
                                    unidade=u["unidade"], local=np.get("local", "")))
+    sincrono = bool(b.get("slot"))
     c = dict(
         id=uid("c-"), tipo=tipo, protocolo=f"{TIPOS.get(tipo, 'TX')}-2026-{DB['contador']:04d}", status="aguardando",
-        prioridade=b.get("prioridade", "Rotina"), modalidade=b.get("modalidade", "assincrona"), hospitalar=bool(b.get("hospitalar")),
+        prioridade=b.get("prioridade", "Rotina"), modalidade="sincrona" if sincrono else "assincrona", hospitalar=True,
+        modo="sala_teleparecer" if sincrono else "", situacao=b.get("situacao", "Internado"),
         anexos=b.get("anexos", []), timeline=[], resposta=None, agendamento=None, sala="r-" + secrets.token_hex(5), pec=None,
-        transcricao=[], especialista=b.get("especialista") or None, anamnese=b.get("anamnese", ""), exame_clinico=b.get("exame_clinico", ""),
+        transcricao=[], especialista=None, anamnese=b.get("anamnese", ""), exame_clinico=b.get("exame_clinico", ""),
         hipotese=b.get("hipotese", ""), duvida=b.get("duvida", ""), queixa=b.get("queixa", ""), criado=now(), prazo=now() + 48 * H,
-        info_pedida=None, paciente=pac, solicitante=u["id"], especialidade=b.get("especialidade", ""), unidade=u["unidade"], mensagens=[])
-    if b.get("duvida") and c["modalidade"] == "assincrona":
-        c["mensagens"].append(dict(autor=u["id"], ts=now(), texto=b["duvida"]))
-    add_event(c, u, "criacao", f"{tipo.capitalize()} solicitado ao serviço de {c['especialidade'] or 'especialidade'}"
-                               + (" (fluxo assíncrono, prazo de 48 h)." if c["modalidade"] == "assincrona" else " (teleatendimento síncrono)."))
-    slot_id = b.get("slot")
-    if slot_id:
-        s = next((x for x in DB["slots"] if x["id"] == slot_id and x["status"] == "livre"), None)
-        if s:
-            s["status"], s["caso"] = "reservado", c["id"]
-            c["especialista"] = s["especialista"]
-            c["status"] = "teleatendimento_agendado"
-            c["agendamento"] = dict(inicio=s["inicio"], fim=s["fim"], slot=s["id"])
-            add_event(c, u, "agenda", "Teleatendimento hospitalar agendado na agenda do especialista.")
+        info_pedida=None, paciente=pac, solicitante=u["id"], especialidade=b.get("especialidade", ""), unidade=u["unidade"])
+    if sincrono:
+        add_event(c, u, "criacao", f"Teleparecer solicitado ao serviço de {c['especialidade']}: paciente pode ser deslocado à sala de teleparecer (passo 6).")
+        s = next((x for x in DB["slots"] if x["id"] == b["slot"] and x["status"] == "livre"), None)
+        if not s:
+            return jr({"erro": "Horário indisponível."}, 409)
+        s["status"], s["caso"] = "reservado", c["id"]
+        c["especialista"] = s["especialista"]
+        c["status"] = "teleatendimento_agendado"
+        c["agendamento"] = dict(inicio=s["inicio"], fim=s["fim"], slot=s["id"])
+        add_event(c, u, "agenda", "Agenda de teleconsulta hospitalar solicitada com o especialista (passo 7).")
+    else:
+        origem = "paciente não pode ser deslocado à sala (passo 6), segue para análise" if b.get("sem_deslocamento") else "teleconsultoria assíncrona (passos 5 e 9)"
+        add_event(c, u, "criacao", f"Teleparecer solicitado ao serviço de {c['especialidade']}: {origem}. Prazo de resposta: 48 h.")
     DB["cases"].insert(0, c)
     audit(u, "Criação de " + tipo, c["protocolo"], request)
     destino = [c["especialista"]] if c["especialista"] else [x["id"] for x in DB["users"] if x["perfil"] == "especialista" and x.get("especialidade") == c["especialidade"]]
-    await notify(destino, f"Novo {tipo} ({c['prioridade']}): {c['protocolo']}", f"/casos/{c['id']}")
+    await notify(destino, f"Novo teleparecer ({c['prioridade']}): {c['protocolo']}", f"/casos/{c['id']}")
     save()
     await push(dict(t="state"))
     return jr(c)
@@ -328,21 +324,26 @@ async def case_action(request):
     act = request.match_info["act"]
     b = await request.json() if request.can_read_body else {}
     pend = []
+    so_esp = {"assumir", "solicitar_info", "agendar", "iniciar_atendimento", "salvar_transcricao", "responder", "assinar"}
+    if act in so_esp and u["perfil"] != "especialista":
+        return jr({"erro": "Ação exclusiva do teleconsultor."}, 403)
+    if act == "enviar_info" and u["perfil"] != "solicitante":
+        return jr({"erro": "Ação exclusiva do médico solicitante."}, 403)
     if act == "assumir":
         c["especialista"] = u["id"]
         c["status"] = "em_analise"
-        add_event(c, u, "analise", "Solicitação assumida para análise.")
+        add_event(c, u, "analise", "Solicitação analisada pelo teleconsultor (passo 10).")
         pend = [c["solicitante"]]
     elif act == "solicitar_info":
         c["status"] = "info_solicitada"
         c["info_pedida"] = b.get("texto", "")
         c["especialista"] = c["especialista"] or u["id"]
-        add_event(c, u, "info", "Solicitado mais informações: " + c["info_pedida"])
+        add_event(c, u, "info", "Opção 1: solicito mais informações: " + c["info_pedida"])
         pend = [c["solicitante"]]
     elif act == "enviar_info":
         c["status"] = "em_analise"
         c["anexos"] += b.get("anexos", [])
-        add_event(c, u, "info", "Informações complementares enviadas: " + b.get("texto", ""))
+        add_event(c, u, "info", "Informações solicitadas anexadas pelo médico: " + b.get("texto", ""))
         pend = [c["especialista"]] if c["especialista"] else []
     elif act == "agendar":
         s = next((x for x in DB["slots"] if x["id"] == b.get("slot") and x["status"] == "livre"), None)
@@ -351,13 +352,14 @@ async def case_action(request):
         s["status"], s["caso"] = "reservado", c["id"]
         c["especialista"] = s["especialista"]
         c["modalidade"] = "sincrona"
+        c["modo"] = "a_beira_leito"
         c["status"] = "teleatendimento_agendado"
         c["agendamento"] = dict(inicio=s["inicio"], fim=s["fim"], slot=s["id"])
-        add_event(c, u, "agenda", "Marcado teleatendimento síncrono com a presença do paciente.")
+        add_event(c, u, "agenda", "Opção 2: favor marcar teleatendimento síncrono com a presença do paciente.")
         pend = [c["solicitante"], c["especialista"]]
     elif act == "iniciar_atendimento":
         c["status"] = "em_atendimento"
-        add_event(c, u, "atendimento", "Teleatendimento iniciado.")
+        add_event(c, u, "atendimento", "Teleatendimento iniciado (passo 8).")
         pend = [x for x in (c["solicitante"], c["especialista"]) if x and x != u["id"]]
     elif act == "salvar_transcricao":
         c["transcricao"] = b.get("linhas", [])
@@ -366,10 +368,10 @@ async def case_action(request):
         op = b.get("opcao", "resolvido")
         c["resposta"] = dict(opcao=op, texto=b.get("texto", ""), por=u["id"], ts=now(), assinatura=None)
         c["especialista"] = c["especialista"] or u["id"]
-        rotulos = dict(resolvido="Teleparecer resolvido e evoluído no prontuário eletrônico", hospitalar="Seguir fluxo hospitalar já estabelecido",
-                       evoluir="Evoluir teleparecer no prontuário")
+        rotulos = dict(resolvido="Teleparecer resolvido e evoluído no prontuário eletrônico (passo 12)", hospitalar="Opção 3: seguir fluxo hospitalar já estabelecido",
+                       evoluir="Opção 4: evoluir teleparecer no prontuário")
         c["status"] = "respondido"
-        add_event(c, u, "resposta", f"Parecer emitido: {rotulos.get(op, op)}.")
+        add_event(c, u, "resposta", f"Resposta registrada: {rotulos.get(op, op)}.")
         pend = [c["solicitante"]]
     elif act == "assinar":
         if not c["resposta"]:
@@ -382,21 +384,7 @@ async def case_action(request):
         add_event(c, u, "pec", "Evolução enviada ao PEC e-SUS APS (homologação, simulada).")
     elif act == "encerrar":
         c["status"] = "encerrado"
-        add_event(c, u, "encerramento", "Pedido encerrado no sistema de Telessaúde.")
-    elif act == "mensagem":
-        texto = (b.get("texto") or "").strip()
-        if not texto:
-            return jr({"erro": "Mensagem vazia."}, 400)
-        c.setdefault("mensagens", []).append(dict(autor=u["id"], ts=now(), texto=texto))
-        if c["status"] == "aguardando" and u["perfil"] == "especialista":
-            c["status"] = "em_analise"
-            c["especialista"] = c["especialista"] or u["id"]
-            add_event(c, u, "analise", "Solicitação assumida para análise.")
-        pend = [c["solicitante"]] if u["id"] != c["solicitante"] else ([c["especialista"]] if c["especialista"] else [])
-        if not pend and u["id"] == c["solicitante"]:
-            pend = [x["id"] for x in DB["users"] if x["perfil"] == "especialista" and x.get("especialidade") == c["especialidade"]]
-        await notify([p for p in pend if p and p != u["id"]], f"{c['protocolo']}: nova mensagem de {u['nome']}", f"/casos/{c['id']}")
-        pend = []
+        add_event(c, u, "encerramento", "Pedido de teleparecer encerrado no sistema de Telessaúde.")
     elif act == "prioridade":
         c["prioridade"] = b.get("prioridade", c["prioridade"])
         add_event(c, u, "analise", f"Prioridade alterada para {c['prioridade']}.")
