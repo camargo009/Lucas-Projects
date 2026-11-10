@@ -3,6 +3,17 @@
 Protótipo funcional para a apresentação de 23/11/2026. Todos os dados são fictícios.
 PEC e-SUS e assinatura ICP-Brasil são **simulados** (hash SHA-256 + página de verificação).
 
+## Rodar em outra máquina (Windows)
+1. Instale o **Python 3.10+** (python.org, marque "Add to PATH") e o Edge ou Chrome.
+2. Clone o repositório: `git clone https://github.com/camargo009/Lucas-Projects.git`
+3. Abra o PowerShell na pasta `Lucas-Projects\telessaude-fepecs\app`.
+4. Se o PowerShell bloquear scripts: `Set-ExecutionPolicy -Scope Process Bypass`
+5. `.\iniciar.ps1 -SemTunel` (instala as dependências e sobe o servidor)
+6. Abra http://localhost:8080
+
+Sem o script: `python -m pip install -r requirements.txt` e `python server.py`.
+Em Linux/macOS: os mesmos dois comandos, usando `python3`.
+
 ## Executar
 ```powershell
 cd app
