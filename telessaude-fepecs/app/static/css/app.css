@@ -174,6 +174,9 @@ table.t { width: 100%; border-collapse: collapse; }
 .o13:has(input:checked) { border-color: var(--azul); background: var(--azul-claro); }
 .o13 b { font-family: var(--mono); color: var(--azul); }
 .pill-info { background: var(--azul-claro); border-radius: 8px; padding: 9px 12px; margin-bottom: 12px; font-size: 13px; }
+.trlist { display: flex; flex-direction: column; gap: 8px; max-height: 340px; overflow: auto; }
+.trm { border: 1px solid var(--line); border-radius: 10px; padding: 9px 12px; background: #fff; margin-right: 60px; }
+.trm.eu { background: var(--azul-claro); margin: 0 0 0 60px; }
 .opt.sel { border-color: var(--azul); background: var(--azul-claro); }
 .opt b { font-family: var(--mono); color: var(--azul); }
 

@@ -329,7 +329,23 @@ async def case_action(request):
         return jr({"erro": "Ação exclusiva do teleconsultor."}, 403)
     if act == "enviar_info" and u["perfil"] != "solicitante":
         return jr({"erro": "Ação exclusiva do médico solicitante."}, 403)
-    if act == "assumir":
+    c.setdefault("mensagens", [])
+    if act == "mensagem":
+        if u["perfil"] not in ("solicitante", "especialista"):
+            return jr({"erro": "Apenas o médico e o teleconsultor trocam informações."}, 403)
+        if c["status"] in ("encerrado",):
+            return jr({"erro": "Pedido encerrado."}, 409)
+        txt = (b.get("texto") or "").strip()
+        if not txt:
+            return jr({"erro": "Escreva a mensagem."}, 400)
+        c["mensagens"].append(dict(ts=now(), autor=u["id"], texto=txt, anexos=b.get("anexos", [])))
+        c["anexos"] += b.get("anexos", [])
+        if c["status"] == "info_solicitada" and u["perfil"] == "solicitante":
+            c["status"] = "em_analise"
+        add_event(c, u, "mensagem", "Mensagem no teleparecer: " + txt[:90])
+        pend = [c["especialista"]] if u["perfil"] == "solicitante" else [c["solicitante"]]
+        pend = [x for x in pend if x]
+    elif act == "assumir":
         c["especialista"] = u["id"]
         c["status"] = "em_analise"
         add_event(c, u, "analise", "Solicitação analisada pelo teleconsultor (passo 10).")
@@ -337,12 +353,14 @@ async def case_action(request):
     elif act == "solicitar_info":
         c["status"] = "info_solicitada"
         c["info_pedida"] = b.get("texto", "")
+        c["mensagens"].append(dict(ts=now(), autor=u["id"], texto="Solicito mais informações: " + c["info_pedida"], anexos=[]))
         c["especialista"] = c["especialista"] or u["id"]
         add_event(c, u, "info", "Opção 1: solicito mais informações: " + c["info_pedida"])
         pend = [c["solicitante"]]
     elif act == "enviar_info":
         c["status"] = "em_analise"
         c["anexos"] += b.get("anexos", [])
+        c["mensagens"].append(dict(ts=now(), autor=u["id"], texto=b.get("texto", ""), anexos=b.get("anexos", [])))
         add_event(c, u, "info", "Informações solicitadas anexadas pelo médico: " + b.get("texto", ""))
         pend = [c["especialista"]] if c["especialista"] else []
     elif act == "agendar":
@@ -356,6 +374,7 @@ async def case_action(request):
         c["status"] = "teleatendimento_agendado"
         c["agendamento"] = dict(inicio=s["inicio"], fim=s["fim"], slot=s["id"])
         add_event(c, u, "agenda", "Opção 2: favor marcar teleatendimento síncrono com a presença do paciente.")
+        c["mensagens"].append(dict(ts=now(), autor=u["id"], texto="Opção 2: favor marcar teleatendimento síncrono com a presença do paciente, em " + s["inicio"][:16].replace("T", " às ") + ".", anexos=[]))
         pend = [c["solicitante"], c["especialista"]]
     elif act == "iniciar_atendimento":
         c["status"] = "em_atendimento"
@@ -372,6 +391,7 @@ async def case_action(request):
                        evoluir="Opção 4: evoluir teleparecer no prontuário")
         c["status"] = "respondido"
         add_event(c, u, "resposta", f"Resposta registrada: {rotulos.get(op, op)}.")
+        c["mensagens"].append(dict(ts=now(), autor=u["id"], texto=f"{rotulos.get(op, op)}: {b.get('texto', '')}", anexos=[]))
         pend = [c["solicitante"]]
     elif act == "assinar":
         if not c["resposta"]:
