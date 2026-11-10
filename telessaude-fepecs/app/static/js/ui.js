@@ -51,7 +51,7 @@ export const und = (id) => S.d.units.find((u) => u.id === id) || { nome: "—" }
 export const caso = (id) => S.d.cases.find((c) => c.id === id);
 export const ini = (nome) => nome.split(" ").filter((x) => x.length > 2).slice(0, 2).map((x) => x[0]).join("").toUpperCase();
 
-export const PERFIL = { admin: "Administrador", gestor: "Gestor", solicitante: "Profissional assistencial", especialista: "Teleconsultor", enfermagem: "Profissional assistencial (enfermagem)", suporte: "Suporte técnico", paciente: "Paciente" };
+export const PERFIL = { admin: "Gestor / Administrador", gestor: "Gestor", solicitante: "Médico", especialista: "Teleconsultor", enfermagem: "Enfermagem", suporte: "Suporte técnico", paciente: "Paciente" };
 export const TIPO = { teleparecer: "Teleparecer", teleinterconsulta: "Teleinterconsulta", teleconsultoria: "Teleconsultoria", teleconsulta: "Teleconsulta", teletriagem: "Teletriagem", telemonitoramento: "Telemonitoramento" };
 export const STATUS = { aguardando: "Aguardando especialista", em_analise: "Em análise", info_solicitada: "Informação solicitada", teleatendimento_agendado: "Teleatendimento agendado", em_atendimento: "Em atendimento", respondido: "Respondido", encerrado: "Encerrado" };
 export const stHtml = (s) => `<span class="st ${s}">${STATUS[s] || s}</span>`;

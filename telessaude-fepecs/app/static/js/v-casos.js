@@ -75,7 +75,7 @@ function desenhaNovo(b) {
   } else if (w.step === "q1sim") {
     corpo = `<div class="decisao"><div class="n">PASSO 3</div><div class="q">Solicite o parecer convencional no prontuário eletrônico</div><p>Este paciente precisa de avaliação presencial. Registre a solicitação de parecer pelo fluxo tradicional do hospital. Nenhum pedido será criado no Telessaúde.</p><div class="bar"><button class="btn sec" id="w-back">Voltar</button><a class="btn" href="#/painel">Concluir</a></div></div>`;
   } else if (w.step === "q2") {
-    corpo = decisao("3", "O parecer pode ser assíncrono?", "A resposta pode ser dada sem que o paciente esteja presente durante a análise, em até 48 horas?", [["sim", "Sim, análise assíncrona do especialista"], ["nao", "Não, é necessário atendimento em tempo real"]]);
+    corpo = decisao("3", "O parecer pode ser assíncrono?", "A resposta pode ser dada sem que o paciente esteja presente durante a análise, em até 48 horas?", [["sim", "Sim, consulta assíncrona por chat/texto com o teleconsultor"], ["nao", "Não, é necessário atendimento em tempo real"]]);
   } else if (w.step === "q3") {
     corpo = decisao("6", "O paciente pode ser levado até a sala de teleparecer?", "A unidade possui sala com equipamento e o paciente tem condições de ser transportado?", [["sim", "Sim, agendar teleconsulta hospitalar na agenda do especialista"], ["nao", "Não, seguir com análise assíncrona"]]);
   } else if (w.step === "agenda") {
@@ -179,6 +179,16 @@ function fhir(c) {
   };
 }
 
+function chatHtml(c, m, aberto) {
+  const ms = c.mensagens || [];
+  const pode = aberto && (m.perfil === "especialista" || c.solicitante === m.id || m.perfil === "admin");
+  const lista = ms.length ? ms.map((x) => {
+    const u = usr(x.autor), eu = x.autor === m.id;
+    return `<div class="bub ${eu ? "eu" : ""}"><div class="bw"><b>${esc(u.nome)}</b> <span>${u.perfil === "especialista" ? "Teleconsultor" : "Médico"} · ${dt(x.ts)}</span></div><div class="bt">${esc(x.texto)}</div></div>`;
+  }).join("") : `<p class="muted" style="margin:0">Nenhuma mensagem ainda. Use este canal para tirar dúvidas por texto, sem precisar de vídeo.</p>`;
+  return `<div class="panel"><div class="ph"><h3>Conversa por texto · consulta assíncrona</h3><span class="small muted">Médico e teleconsultor, sem horário marcado</span></div><div class="pb"><div class="chatl" id="chl">${lista}</div>${pode ? `<div class="chatc"><textarea id="cht" placeholder="Escreva sua mensagem (Ctrl+Enter envia)"></textarea><button class="btn" id="chs">${ic.check} Enviar</button></div>` : ""}</div></div>`;
+}
+
 export function detalhe(id, box) {
   const c = caso(id);
   if (!c) return pageHead("Solicitação não encontrada");
@@ -202,11 +212,13 @@ export function detalhe(id, box) {
     `<div class="grid g-main"><div class="stack">
     <div class="panel"><div class="ph"><h3>Paciente e solicitação</h3></div><div class="pb"><dl class="dl">
       <dt>Paciente</dt><dd><b>${esc(p.nome)}</b> · ${idade(p.nasc)} anos · ${p.sexo === "F" ? "F" : "M"}</dd><dt>CNS</dt><dd class="mono">${esc(p.cns)}</dd><dt>Local</dt><dd>${esc(p.local)} · ${esc(und(c.unidade).nome)}</dd>
-      <dt>Solicitante</dt><dd>${esc(usr(c.solicitante).nome)} <span class="muted">· ${esc(usr(c.solicitante).cargo || "")}</span></dd><dt>Especialidade</dt><dd>${esc(c.especialidade)}${c.especialista ? ` · ${esc(usr(c.especialista).nome)}` : ""}</dd>
+      <dt>Médico solicitante</dt><dd>${esc(usr(c.solicitante).nome)} <span class="muted">· ${esc(usr(c.solicitante).cargo || "")}</span></dd><dt>Teleconsultor</dt><dd>${c.especialista ? `${esc(usr(c.especialista).nome)} <span class="muted">· ${esc(c.especialidade)}</span>` : `<span class="muted">Aguardando um teleconsultor de ${esc(c.especialidade)}</span>`}</dd>
+      <dt>Seu papel</dt><dd><span class="tag azul">${m.perfil === "solicitante" ? "Você é o médico solicitante" : m.perfil === "especialista" ? "Você é o teleconsultor" : "Gestão"}</span></dd>
       <dt>Prazo</dt><dd>${slaHtml(c)}</dd>${ag ? `<dt>Teleatendimento</dt><dd><b>${dt(ag.inicio)}</b></dd>` : ""}</dl></div></div>
     <div class="panel"><div class="ph"><h3>Dados clínicos</h3></div><div class="pb"><dl class="dl"><dt>Queixa</dt><dd>${esc(c.queixa)}</dd><dt>Anamnese</dt><dd class="txtblk">${esc(c.anamnese)}</dd><dt>Exame clínico</dt><dd class="txtblk">${esc(c.exame_clinico)}</dd><dt>Hipótese</dt><dd>${esc(c.hipotese)}</dd><dt>Dúvida</dt><dd class="txtblk">${esc(c.duvida)}</dd>${c.anexos.length ? `<dt>Anexos</dt><dd>${c.anexos.map((a) => esc(a.nome)).join(", ")}</dd>` : ""}</dl>
       ${c.info_pedida && c.status === "info_solicitada" ? `<div class="err" style="margin:12px 0 0"><b>Informação solicitada pelo especialista:</b> ${esc(c.info_pedida)}</div>` : ""}</div></div>
-    ${r ? `<div class="panel" style="border-left:4px solid var(--verde)"><div class="ph"><h3>Parecer do especialista</h3><span class="tag verde">${esc(OP[r.opcao] || r.opcao)}</span></div><div class="pb"><div class="txtblk">${esc(r.texto)}</div><p class="small muted" style="margin-bottom:0">${esc(usr(r.por).nome)} · ${dt(r.ts)}${r.assinatura ? ` · <span class="tag verde">assinado</span> <span class="mono">${r.assinatura.hash.slice(0, 16)}…</span>` : ' · <span class="tag ambar">aguardando assinatura</span>'}</p></div></div>` : ""}
+    ${chatHtml(c, m, aberto)}
+    ${r ? `<div class="panel" style="border-left:4px solid var(--verde)"><div class="ph"><h3>Parecer do teleconsultor</h3><span class="tag verde">${esc(OP[r.opcao] || r.opcao)}</span></div><div class="pb"><div class="txtblk">${esc(r.texto)}</div><p class="small muted" style="margin-bottom:0">${esc(usr(r.por).nome)} · ${dt(r.ts)}${r.assinatura ? ` · <span class="tag verde">assinado</span> <span class="mono">${r.assinatura.hash.slice(0, 16)}…</span>` : ' · <span class="tag ambar">aguardando assinatura</span>'}</p></div></div>` : ""}
     ${c.transcricao.length ? `<div class="panel"><div class="ph"><h3>Transcrição do teleatendimento</h3></div><div class="pb small">${c.transcricao.map((l) => `<div><b>${esc(l.autor)}:</b> ${esc(l.texto)}</div>`).join("")}</div></div>` : ""}
     </div><div class="stack">
     ${esp ? copilotoHtml(c) : ""}
@@ -232,6 +244,15 @@ function ligaDetalhe(b, c) {
   on("#setbase", (e) => { e.preventDefault(); const v = prompt("URL pública (ex.: https://xxxx.trycloudflare.com)", baseUrl()); if (v !== null) { v ? localStorage.setItem("baseUrl", v.replace(/\/$/, "")) : localStorage.removeItem("baseUrl"); location.reload(); } });
   on("#vf", (e) => { e.preventDefault(); modal({ titulo: "FHIR Bundle · PEC e-SUS APS (simulado)", lg: true, semRodape: true, corpo: `<pre class="json">${esc(JSON.stringify(fhir(c), null, 2))}</pre>` }); });
   const pr = b.querySelector("#pr");
+  const chl = b.querySelector("#chl"); if (chl) chl.scrollTop = chl.scrollHeight;
+  const enviarMsg = async () => {
+    const t = b.querySelector("#cht").value.trim(); if (!t) return;
+    b.querySelector("#chs").disabled = true;
+    try { await acao(c, "mensagem", { texto: t }); const r = detalhe(c.id); b.innerHTML = r.html; r.after(b); const l = b.querySelector("#chl"); if (l) l.scrollTop = l.scrollHeight; }
+    catch (e) { toast(e.message, true); b.querySelector("#chs").disabled = false; }
+  };
+  on("#chs", enviarMsg);
+  b.querySelector("#cht")?.addEventListener("keydown", (e) => { if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) { e.preventDefault(); enviarMsg(); } });
   if (pr) pr.onchange = async () => { await acao(c, "prioridade", { prioridade: pr.value }); toast("Prioridade atualizada."); location.reload(); };
   const h = {
     assumir: async () => { await acao(c, "assumir"); toast("Solicitação assumida."); },

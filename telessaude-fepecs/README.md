@@ -23,12 +23,11 @@ cd app
 Acesse http://localhost:8080. Senha de todas as contas: `telessaude`
 (e-mails `@telessaude.fepecs`).
 
-| Perfil (conforme o termo de referência) | Conta |
-|---|---|
-| Administrador / Gestor | admin@ / gestor@ |
-| Profissional assistencial | henrique.matos@ (HRAN), livia.andrade@ (HRT), camila.reis@ (UBS 3 Ceilândia), patricia.souza@ (enfermagem, UBS 1 Planaltina) |
-| Teleconsultor | beatriz.nogueira@ (Cardiologia), andre.lacerda@ (Nefrologia), rafael.teixeira@ (Pneumologia, laudista de espirometria) |
-| Suporte técnico | suporte@ |
+| Perfil | Conta | Papel |
+|---|---|---|
+| Médico | medico@ (Dr. Henrique Matos, HRAN) | Atende o paciente, abre a solicitação, conversa com o teleconsultor |
+| Teleconsultor | teleconsultor@ (Dra. Beatriz Nogueira, Cardiologia) | Responde por chat assíncrono ou vídeo, emite e assina o parecer |
+| Gestor / Administrador | gestor@ (Marina Duarte) | Cadastros, agenda, auditoria, integrações, suporte |
 
 ## Módulos (conforme documento FEPECS)
 Administrativo, Suporte, Teleinterconsultas, Teleconsulta/Telemonitoramento/Teletriagem,
@@ -36,13 +35,13 @@ Teleconsultoria/Teleparecer (Fluxo 1 completo), Telereuniões, Telediagnóstico 
 Interface PEC e-SUS (FHIR Bundle simulado), Assinatura eletrônica (verificação por QR).
 
 ## Roteiro sugerido
-1. Henrique (solicitante) → **Novo caso** → percorre o Fluxo 1 → envia.
-2. Beatriz (especialista) → assume → solicita informação → Henrique responde.
+1. Médico → **Nova solicitação** → percorre o Fluxo 1 (assíncrono = chat/texto) → envia.
+2. Teleconsultor → assume → **conversa por texto** no caso (consulta assíncrona) → solicita informação → médico responde.
 3. Agendar teleparecer → **Entrar na sala**. O dev remoto abre a URL pública e
    entra como Henrique; o paciente entra pelo link/QR do caso (sem login).
 4. Beatriz emite parecer (use o rascunho do Copiloto), assina, envia ao PEC e encerra.
 5. Mostrar documento impresso e a verificação pelo QR.
-6. Telediagnóstico: Rafael lauda a espirometria. Admin → Auditoria.
+6. Telediagnóstico: teleconsultor lauda a espirometria. Gestor → Auditoria.
 
 ## Vídeo remoto
 Câmera exige HTTPS: use o túnel do `iniciar.ps1`. No caso, "Definir URL pública"

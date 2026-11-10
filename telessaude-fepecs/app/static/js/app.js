@@ -7,11 +7,8 @@ import * as R from "./v-sala.js";
 
 const MENU = {
   admin: ["painel", "casos", "agenda", "reunioes", "telediagnostico", "suporte", "admin", "integracoes", "fluxo"],
-  gestor: ["painel", "casos", "reunioes", "telediagnostico", "admin", "integracoes", "fluxo"],
   solicitante: ["painel", "novo", "casos", "agenda", "reunioes", "telediagnostico", "suporte", "fluxo"],
-  enfermagem: ["painel", "novo", "casos", "agenda", "reunioes", "telediagnostico", "suporte"],
   especialista: ["painel", "casos", "agenda", "reunioes", "telediagnostico", "suporte", "fluxo"],
-  suporte: ["painel", "suporte", "admin"],
 };
 const ITEM = {
   painel: ["Painel", "home"], novo: ["Nova solicitação", "plus"], casos: ["Solicitações", "inbox"], agenda: ["Agenda", "cal"],
@@ -124,13 +121,13 @@ function painel() {
 
 function login() {
   const r = $app();
-  const demo = [["admin@telessaude.fepecs", "Marina Duarte", "Administrador"], ["gestor@telessaude.fepecs", "Roberto Alencar", "Gestor"], ["henrique.matos@telessaude.fepecs", "Henrique Matos", "Profissional assistencial · HRAN"], ["camila.reis@telessaude.fepecs", "Camila Reis", "Profissional assistencial · UBS 3 Ceilândia"], ["patricia.souza@telessaude.fepecs", "Patrícia Souza", "Enfermagem · UBS 1 Planaltina"], ["beatriz.nogueira@telessaude.fepecs", "Beatriz Nogueira", "Teleconsultor · Cardiologia"], ["rafael.teixeira@telessaude.fepecs", "Rafael Teixeira", "Teleconsultor · Pneumologia"], ["suporte@telessaude.fepecs", "Thiago Ramos", "Suporte técnico"]];
+  const demo = [["medico@telessaude.fepecs", "Médico", "Dr. Henrique Matos · HRAN", "Quem atende o paciente e pede o parecer. Abre solicitações, conversa por texto ou vídeo com o teleconsultor."], ["teleconsultor@telessaude.fepecs", "Teleconsultor", "Dra. Beatriz Nogueira · Cardiologia", "Especialista que responde: chat assíncrono, teleatendimento com o paciente, parecer assinado."], ["gestor@telessaude.fepecs", "Gestor / Administrador", "Marina Duarte · Núcleo de Telessaúde", "Cadastros, agenda, indicadores, auditoria, integrações e suporte."]];
   r.innerHTML = `<div class="login"><div class="left"><div class="logos"><img class="f" src="/img/fepecs.png" alt="FEPECS"><img class="b" src="/img/bazetech.png" alt="BazeTech"></div>
     <div><div class="small" style="letter-spacing:.14em;text-transform:uppercase;color:#9fb7d1">Secretaria de Estado de Saúde do Distrito Federal</div><h1>Telessaúde<br><b>FEPECS</b></h1><p>Teleparecer, teleinterconsulta, teleconsulta e telediagnóstico em uma única plataforma, integrada ao prontuário e com segurança conforme a LGPD.</p></div>
     <div class="modulos">ADMINISTRATIVO · SUPORTE · TELEINTERCONSULTAS · TELECONSULTA · TELECONSULTORIA · TELEREUNIÕES · TELEDIAGNÓSTICO · INTERFACE PEC · ASSINATURA ELETRÔNICA</div></div>
     <div class="right"><div class="box"><h2>Acesso ao sistema</h2><p class="muted" style="margin:0 0 18px">Entre com seu e-mail institucional.</p><div id="lerr"></div>
     <form id="lf" class="f"><div class="fld"><label>E-mail</label><input id="le" type="email" required autocomplete="username"></div><div class="fld"><label>Senha</label><input id="ls" type="password" required autocomplete="current-password"></div><button class="btn" style="justify-content:center;padding:10px">Entrar</button></form>
-    <div class="demo"><h4>Contas de demonstração (senha: telessaude)</h4>${demo.map((x) => `<button data-e="${x[0]}">${x[1]}<span>${x[2]}</span></button>`).join("")}</div></div></div></div>`;
+    <div class="demo"><h4>Entrar como (demonstração · senha: telessaude)</h4>${demo.map((x) => `<button data-e="${x[0]}"><div><b>${x[1]}</b><div class="small muted">${x[2]}</div><div class="small desc">${x[3]}</div></div></button>`).join("")}</div></div></div></div>`;
   const go = async (email, senha) => {
     try {
       const j = await api("/login", { email, senha });

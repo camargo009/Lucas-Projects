@@ -45,16 +45,9 @@ def at(days=0, hour=9, minute=0):
 
 def seed():
     users = [
-        dict(id="u-admin", nome="Marina Duarte", email="admin@telessaude.fepecs", perfil="admin", cargo="Coordenação do Núcleo de Telessaúde", unidade="u-nuc"),
-        dict(id="u-gestor", nome="Roberto Alencar", email="gestor@telessaude.fepecs", perfil="gestor", cargo="Gerência de Serviços de Telessaúde", unidade="u-nuc"),
-        dict(id="u-sol1", nome="Henrique Matos", email="henrique.matos@telessaude.fepecs", perfil="solicitante", cargo="Médico residente, Clínica Médica", unidade="u-hran", crm="CRM-DF 00000"),
-        dict(id="u-sol2", nome="Camila Reis", email="camila.reis@telessaude.fepecs", perfil="solicitante", cargo="Médica residente, Medicina de Família e Comunidade", unidade="u-ubs2", crm="CRM-DF 00001"),
-        dict(id="u-sol3", nome="Lívia Andrade", email="livia.andrade@telessaude.fepecs", perfil="solicitante", cargo="Médica, Clínica Médica", unidade="u-hrt", crm="CRM-DF 00005"),
-        dict(id="u-esp1", nome="Beatriz Nogueira", email="beatriz.nogueira@telessaude.fepecs", perfil="especialista", cargo="Cardiologista", especialidade="Cardiologia", unidade="u-hran", crm="CRM-DF 00002"),
-        dict(id="u-esp2", nome="Rafael Teixeira", email="rafael.teixeira@telessaude.fepecs", perfil="especialista", cargo="Pneumologista", especialidade="Pneumologia", unidade="u-pol", crm="CRM-DF 00003"),
-        dict(id="u-esp3", nome="André Lacerda", email="andre.lacerda@telessaude.fepecs", perfil="especialista", cargo="Nefrologista", especialidade="Nefrologia", unidade="u-hrg", crm="CRM-DF 00004"),
-        dict(id="u-enf", nome="Patrícia Souza", email="patricia.souza@telessaude.fepecs", perfil="enfermagem", cargo="Enfermeira, Estratégia Saúde da Família", unidade="u-ubs1", coren="COREN-DF 00000"),
-        dict(id="u-sup", nome="Thiago Ramos", email="suporte@telessaude.fepecs", perfil="suporte", cargo="Suporte técnico (BazeTech)", unidade="u-nuc"),
+        dict(id="u-admin", nome="Marina Duarte", email="gestor@telessaude.fepecs", perfil="admin", cargo="Gestora e administradora do Núcleo de Telessaúde", unidade="u-nuc"),
+        dict(id="u-sol1", nome="Dr. Henrique Matos", email="medico@telessaude.fepecs", perfil="solicitante", cargo="Médico assistente, Clínica Médica", unidade="u-hran", crm="CRM-DF 00000"),
+        dict(id="u-esp1", nome="Dra. Beatriz Nogueira", email="teleconsultor@telessaude.fepecs", perfil="especialista", cargo="Teleconsultora, Cardiologia", especialidade="Cardiologia", unidade="u-pol", crm="CRM-DF 00002"),
     ]
     units = [
         dict(id="u-nuc", nome="Núcleo de Telessaúde FEPECS/SES-DF", tipo="Gestão", regiao="Asa Norte", cnes="—"),
@@ -68,10 +61,10 @@ def seed():
     ]
     patients = [
         dict(id="p1", nome="José Antônio Ferreira", nasc="1951-03-14", sexo="M", cns="700 0000 0000 0001", unidade="u-hran", local="Enfermaria 4B, leito 12"),
-        dict(id="p2", nome="Maria das Graças Lima", nasc="1964-09-02", sexo="F", cns="700 0000 0000 0002", unidade="u-hrt", local="Clínica Médica, leito 7"),
-        dict(id="p3", nome="Ricardo Pires Cunha", nasc="1978-12-21", sexo="M", cns="700 0000 0000 0003", unidade="u-ubs2", local="Ambulatório"),
-        dict(id="p4", nome="Ana Beatriz Moura", nasc="1992-06-30", sexo="F", cns="700 0000 0000 0004", unidade="u-ubs1", local="Ambulatório"),
-        dict(id="p5", nome="Sebastião Rocha Neto", nasc="1947-01-09", sexo="M", cns="700 0000 0000 0005", unidade="u-hrg", local="UTI, leito 3"),
+        dict(id="p2", nome="Maria das Graças Lima", nasc="1964-09-02", sexo="F", cns="700 0000 0000 0002", unidade="u-hran", local="Enfermaria 3A, leito 7"),
+        dict(id="p3", nome="Ricardo Pires Cunha", nasc="1978-12-21", sexo="M", cns="700 0000 0000 0003", unidade="u-hran", local="Ambulatório"),
+        dict(id="p4", nome="Ana Beatriz Moura", nasc="1992-06-30", sexo="F", cns="700 0000 0000 0004", unidade="u-hran", local="Ambulatório"),
+        dict(id="p5", nome="Sebastião Rocha Neto", nasc="1947-01-09", sexo="M", cns="700 0000 0000 0005", unidade="u-hran", local="UTI, leito 3"),
         dict(id="p6", nome="Luciana Barros Gomes", nasc="1985-04-17", sexo="F", cns="700 0000 0000 0006", unidade="u-hran", local="Enfermaria 2A, leito 5"),
     ]
 
@@ -85,7 +78,7 @@ def seed():
             id=uid("c-"), tipo=tipo, protocolo=f"{TIPOS[tipo]}-2026-{n:04d}", status="aguardando", prioridade="Rotina",
             modalidade="assincrona", hospitalar=True, anexos=[], timeline=[], resposta=None, agendamento=None,
             sala="r-" + secrets.token_hex(5), pec=None, transcricao=[], especialista=None, anamnese="", exame_clinico="",
-            hipotese="", duvida="", queixa="", criado=now(), prazo=None, info_pedida=None,
+            hipotese="", duvida="", queixa="", criado=now(), prazo=None, info_pedida=None, mensagens=[],
         )
         base.update(kw)
         c.append(base)
@@ -99,27 +92,32 @@ def seed():
              criado=now() - 20 * H, prazo=now() + 28 * H)
     a["timeline"] = [ev("u-sol1", "criacao", "Teleparecer solicitado ao serviço de Cardiologia (fluxo assíncrono, prazo de 48 h).", a["criado"])]
 
-    b = case("teleparecer", 2, paciente="p2", solicitante="u-sol3", especialista="u-esp2", especialidade="Pneumologia", unidade="u-hrt",
-             status="info_solicitada", queixa="Tosse crônica com hemoptise esporádica",
-             anamnese="Feminina, 61 anos, ex-tabagista (30 maços/ano), internada para investigação de tosse com hemoptise esporádica há 3 semanas.",
-             exame_clinico="SpO2 95% em ar ambiente, murmúrio vesicular diminuído em ápice direito. Sem febre.",
-             hipotese="Suspeita de neoplasia pulmonar versus tuberculose", duvida="Quais exames complementares priorizar?",
-             criado=now() - 30 * H, prazo=now() + 18 * H,
-             info_pedida="Enviar laudo da radiografia de tórax e resultado da baciloscopia, se disponíveis.")
-    b["timeline"] = [ev("u-sol3", "criacao", "Teleparecer solicitado.", b["criado"] ),
-                     ev("u-esp2", "info", "Solicitado mais informações: enviar laudo da radiografia de tórax e resultado da baciloscopia.", now() - 6 * H)]
+    a["mensagens"] = [dict(autor="u-sol1", ts=now() - 19 * H, texto="Bom dia, Dra. Beatriz. Paciente com IC descompensada, resposta parcial à furosemida EV. Posso aumentar a dose ou prefiro associar outro diurético?"),
+                      dict(autor="u-esp1", ts=now() - 17 * H, texto="Bom dia, Henrique. Qual o peso atual versus o peso seco e a creatinina de hoje?"),
+                      dict(autor="u-sol1", ts=now() - 16 * H, texto="Peso 82 kg (seco estimado 74 kg). Creatinina 1,3 e potássio 3,9.")]
 
-    d = case("teleparecer", 3, paciente="p5", solicitante="u-sol1", especialista="u-esp3", especialidade="Nefrologia", unidade="u-hrg",
-             status="respondido", prioridade="Prioritário", queixa="Elevação de creatinina em paciente de UTI",
-             anamnese="Masculino, 78 anos, UTI por pneumonia grave. Creatinina de 1,1 para 2,4 mg/dL em 48 h, diurese reduzida.",
-             exame_clinico="Hipotenso em uso de noradrenalina, mucosas úmidas, edema discreto.",
-             hipotese="Lesão renal aguda", duvida="Indicação de terapia renal substitutiva?",
+    b = case("teleparecer", 2, paciente="p2", solicitante="u-sol1", especialista="u-esp1", especialidade="Cardiologia", unidade="u-hran",
+             status="info_solicitada", queixa="Dor torácica atípica com troponina limítrofe",
+             anamnese="Feminina, 61 anos, hipertensa e dislipidêmica, internada com dor torácica em aperto, de curta duração, sem relação clara com esforço.",
+             exame_clinico="PA 140/85, FC 78 bpm, ausculta cardíaca normal, sem sinais de congestão.",
+             hipotese="Dor torácica a esclarecer, baixa probabilidade de síndrome coronariana aguda", duvida="Qual estratégia de estratificação priorizar?",
+             criado=now() - 30 * H, prazo=now() + 18 * H,
+             info_pedida="Enviar o ECG de 12 derivações e a curva de troponina seriada.")
+    b["timeline"] = [ev("u-sol1", "criacao", "Teleparecer solicitado.", b["criado"]),
+                     ev("u-esp1", "info", "Solicitado mais informações: enviar o ECG de 12 derivações e a curva de troponina seriada.", now() - 6 * H)]
+    b["mensagens"] = [dict(autor="u-esp1", ts=now() - 6 * H, texto="Henrique, preciso do ECG de 12 derivações e da curva de troponina seriada para seguir.")]
+
+    d = case("teleparecer", 3, paciente="p5", solicitante="u-sol1", especialista="u-esp1", especialidade="Cardiologia", unidade="u-hran",
+             status="respondido", prioridade="Prioritário", queixa="Fibrilação atrial de início recente com resposta ventricular rápida",
+             anamnese="Masculino, 78 anos, UTI por pneumonia grave. Iniciou fibrilação atrial com FC 140 bpm, hemodinamicamente estável.",
+             exame_clinico="PA 118/72 em uso de noradrenalina em baixa dose, FC 138 bpm irregular.",
+             hipotese="Fibrilação atrial secundária ao quadro séptico", duvida="Controle de frequência, cardioversão ou anticoagulação?",
              criado=now() - 3 * D, prazo=now() - 1 * D)
-    d["resposta"] = dict(opcao="resolvido", texto="Quadro compatível com lesão renal aguda pré-renal/NTA em contexto séptico. Sem indicação de terapia renal substitutiva no momento: sem acidose grave, hipercalemia ou sobrecarga refratária. Otimizar volemia e pressão de perfusão, suspender nefrotóxicos e reavaliar creatinina e diurese em 24 h. Nova discussão se piora.",
-                         por="u-esp3", ts=now() - 2 * D,
-                         assinatura=dict(hash=hashlib.sha256(b"seed-1").hexdigest(), por="u-esp3", ts=now() - 2 * D, tipo="ICP-Brasil (simulada)"))
+    d["resposta"] = dict(opcao="resolvido", texto="Fibrilação atrial desencadeada por sepse. Priorizar tratamento do fator precipitante e correção de eletrólitos (K > 4,0 e Mg > 2,0). Controle de frequência com amiodarona conforme tolerância hemodinâmica; evitar betabloqueador e bloqueador de canal de cálcio enquanto em vasopressor. Avaliar anticoagulação após estabilização, conforme CHA2DS2-VASc e risco de sangramento. Reavaliar ritmo em 24 h.",
+                         por="u-esp1", ts=now() - 2 * D,
+                         assinatura=dict(hash=hashlib.sha256(b"seed-1").hexdigest(), por="u-esp1", ts=now() - 2 * D, tipo="ICP-Brasil (simulada)"))
     d["timeline"] = [ev("u-sol1", "criacao", "Teleparecer solicitado.", d["criado"]),
-                     ev("u-esp3", "resposta", "Parecer emitido e assinado: resolvido e evoluído no prontuário eletrônico.", now() - 2 * D)]
+                     ev("u-esp1", "resposta", "Parecer emitido e assinado: resolvido e evoluído no prontuário eletrônico.", now() - 2 * D)]
     d["pec"] = dict(status="enviado", id="Bundle/" + uid(), ts=now() - 2 * D)
 
     e = case("teleparecer", 4, paciente="p6", solicitante="u-sol1", especialista="u-esp1", especialidade="Cardiologia", unidade="u-hran",
@@ -132,55 +130,55 @@ def seed():
     e["timeline"] = [ev("u-sol1", "criacao", "Teleparecer solicitado.", e["criado"]),
                      ev("u-esp1", "agenda", "Marcado teleatendimento síncrono com a presença do paciente.", now() - 2 * H)]
 
-    f = case("teleinterconsulta", 5, paciente="p3", solicitante="u-sol2", especialista="u-esp3", especialidade="Nefrologia", unidade="u-ubs2",
-             hospitalar=False, status="em_analise", queixa="Diabetes tipo 2 com proteinúria persistente",
-             anamnese="Masculino, 45 anos, DM2 há 12 anos, HAS. Relação albumina/creatinina de 420 mg/g em duas amostras.",
-             exame_clinico="PA 138/86, IMC 31, sem edema.", hipotese="Doença renal do diabetes",
-             duvida="Iniciar iSGLT2? Quando encaminhar presencialmente?", criado=now() - 26 * H, prazo=now() + 22 * H)
-    f["timeline"] = [ev("u-sol2", "criacao", "Teleinterconsulta solicitada pela APS.", f["criado"]),
-                     ev("u-esp3", "analise", "Solicitação assumida para análise.", now() - 5 * H)]
+    f = case("teleinterconsulta", 5, paciente="p3", solicitante="u-sol1", especialista="u-esp1", especialidade="Cardiologia", unidade="u-hran",
+             hospitalar=False, status="em_analise", queixa="Hipertensão de difícil controle",
+             anamnese="Masculino, 45 anos, HAS há 10 anos, em uso de losartana, anlodipino e hidroclorotiazida em doses plenas, com PA persistentemente acima de 160/100.",
+             exame_clinico="PA 164/102, IMC 31, sem edema, ausculta cardíaca normal.", hipotese="Hipertensão resistente",
+             duvida="Investigar causas secundárias? Qual o próximo passo terapêutico?", criado=now() - 26 * H, prazo=now() + 22 * H)
+    f["timeline"] = [ev("u-sol1", "criacao", "Teleinterconsulta solicitada.", f["criado"]),
+                     ev("u-esp1", "analise", "Solicitação assumida para análise.", now() - 5 * H)]
 
-    g = case("teletriagem", 6, paciente="p4", solicitante="u-enf", especialidade="Pneumologia", unidade="u-ubs1", hospitalar=False,
-             queixa="Tosse seca há 6 semanas", anamnese="Feminina, 33 anos, não fumante, tosse seca persistente, sem febre.",
-             exame_clinico="Ausculta pulmonar normal.", hipotese="Asma de início tardio?", duvida="Encaminhar para espirometria?",
+    g = case("teletriagem", 6, paciente="p4", solicitante="u-sol1", especialidade="Cardiologia", unidade="u-hran", hospitalar=False,
+             queixa="Palpitações há 3 semanas", anamnese="Feminina, 33 anos, sem comorbidades, palpitações ocasionais em repouso, sem síncope.",
+             exame_clinico="Ausculta cardíaca normal, ECG de repouso sem alterações.", hipotese="Extrassístoles benignas?", duvida="Encaminhar para Holter?",
              criado=now() - 4 * H, prazo=now() + 44 * H)
-    g["timeline"] = [ev("u-enf", "criacao", "Teletriagem solicitada.", g["criado"])]
+    g["timeline"] = [ev("u-sol1", "criacao", "Teletriagem solicitada.", g["criado"])]
 
-    h = case("teleconsulta", 7, paciente="p3", solicitante="u-sol2", especialista="u-esp3", especialidade="Nefrologia", unidade="u-ubs2",
-             hospitalar=False, modalidade="sincrona", status="teleatendimento_agendado", queixa="Retorno de seguimento, doença renal crônica",
+    h = case("teleconsulta", 7, paciente="p3", solicitante="u-sol1", especialista="u-esp1", especialidade="Cardiologia", unidade="u-hran",
+             hospitalar=False, modalidade="sincrona", status="teleatendimento_agendado", queixa="Retorno de seguimento, hipertensão resistente",
              anamnese="Retorno após ajuste terapêutico.", criado=now() - 2 * D, prazo=now() + 1 * D)
     h["agendamento"] = dict(inicio=at(1, 10, 0), fim=at(1, 10, 30), slot="s-seed2")
-    h["timeline"] = [ev("u-sol2", "criacao", "Teleconsulta de retorno agendada.", h["criado"])]
+    h["timeline"] = [ev("u-sol1", "criacao", "Teleconsulta de retorno agendada.", h["criado"])]
 
     slots = []
-    for esp in ("u-esp1", "u-esp2", "u-esp3"):
+    for esp in ("u-esp1",):
         for day in range(0, 5):
             for hr in (9, 10, 14, 15, 16):
                 slots.append(dict(id=uid("s-"), especialista=esp, inicio=at(day, hr, 0), fim=at(day, hr, 30), status="livre", caso=None))
     slots = [s for s in slots if s["inicio"] > now()]
 
     exams = [
-        dict(id="e1", paciente="p4", tipo="Espirometria", coleta="u-ubs1", status="aguardando", solicitado=now() - 5 * H,
+        dict(id="e1", paciente="p4", tipo="Espirometria", coleta="u-hran", status="aguardando", solicitado=now() - 5 * H,
              params=dict(cvf=3.2, vef1=2.1, pef=5.1, cvf_prev=3.6, vef1_prev=3.0), pdf="espirometria-p4.pdf", laudo=None, laudista=None),
-        dict(id="e2", paciente="p3", tipo="Espirometria", coleta="u-ubs2", status="aguardando", solicitado=now() - 26 * H,
+        dict(id="e2", paciente="p3", tipo="Espirometria", coleta="u-hran", status="aguardando", solicitado=now() - 26 * H,
              params=dict(cvf=4.2, vef1=3.5, pef=8.4, cvf_prev=4.5, vef1_prev=3.7), pdf="espirometria-p3.pdf", laudo=None, laudista=None),
-        dict(id="e3", paciente="p2", tipo="Espirometria", coleta="u-hrt", status="laudado", solicitado=now() - 3 * D,
+        dict(id="e3", paciente="p2", tipo="Espirometria", coleta="u-hran", status="laudado", solicitado=now() - 3 * D,
              params=dict(cvf=2.3, vef1=1.2, pef=3.4, cvf_prev=3.0, vef1_prev=2.4), pdf="espirometria-p2.pdf",
-             laudo="Distúrbio ventilatório obstrutivo de grau moderado, sem resposta significativa ao broncodilatador. Correlacionar com quadro clínico.", laudista="u-esp2"),
+             laudo="Distúrbio ventilatório obstrutivo de grau moderado, sem resposta significativa ao broncodilatador. Correlacionar com quadro clínico.", laudista="u-esp1"),
     ]
     tickets = [
-        dict(id="t1", titulo="Não consigo anexar PDF acima de 10 MB", categoria="Anexos", prioridade="Média", status="aberto", autor="u-sol2",
-             criado=now() - 6 * H, respostas=[dict(autor="u-sup", ts=now() - 5 * H, texto="O limite do piloto é 10 MB por arquivo. Comprima o PDF ou divida em duas partes.")]),
-        dict(id="t2", titulo="Solicitação de perfil de especialista para novo profissional", categoria="Acesso", prioridade="Baixa", status="em_atendimento", autor="u-gestor",
+        dict(id="t1", titulo="Não consigo anexar PDF acima de 10 MB", categoria="Anexos", prioridade="Média", status="aberto", autor="u-sol1",
+             criado=now() - 6 * H, respostas=[dict(autor="u-admin", ts=now() - 5 * H, texto="O limite do piloto é 10 MB por arquivo. Comprima o PDF ou divida em duas partes.")]),
+        dict(id="t2", titulo="Cadastro de novo teleconsultor de Nefrologia", categoria="Acesso", prioridade="Baixa", status="em_atendimento", autor="u-esp1",
              criado=now() - 2 * D, respostas=[]),
     ]
     meetings = [
         dict(id="m1", titulo="Discussão de casos: Insuficiência Cardíaca", tipo="telegrupo", inicio=at(1, 14, 0), anfitriao="u-esp1",
-             participantes=["u-sol1", "u-sol2", "u-enf"], sala="r-" + secrets.token_hex(5), pauta="Manejo da IC descompensada na enfermaria e critérios de alta."),
+             participantes=["u-sol1", "u-admin"], sala="r-" + secrets.token_hex(5), pauta="Manejo da IC descompensada na enfermaria e critérios de alta."),
         dict(id="m2", titulo="Reunião de alinhamento do Núcleo", tipo="reuniao", inicio=at(0, 17, 0), anfitriao="u-admin",
-             participantes=["u-gestor", "u-sup"], sala="r-" + secrets.token_hex(5), pauta="Indicadores do piloto e próximos módulos."),
+             participantes=["u-esp1", "u-sol1"], sala="r-" + secrets.token_hex(5), pauta="Indicadores do piloto e próximos módulos."),
     ]
-    audit = [dict(ts=now() - 3 * H, user="u-esp3", acao="Login", alvo="Sessão", ip="10.0.4.21"),
+    audit = [dict(ts=now() - 3 * H, user="u-sol1", acao="Login", alvo="Sessão", ip="10.0.4.21"),
              dict(ts=now() - 2 * H, user="u-esp1", acao="Agendamento de teleatendimento", alvo=e["protocolo"], ip="10.0.7.8")]
     return dict(users=users, units=units, patients=patients, cases=c, slots=slots, exams=exams, tickets=tickets,
                 meetings=meetings, audit=audit, notifs=[], contador=7)
@@ -299,7 +297,9 @@ async def create_case(request):
         anexos=b.get("anexos", []), timeline=[], resposta=None, agendamento=None, sala="r-" + secrets.token_hex(5), pec=None,
         transcricao=[], especialista=b.get("especialista") or None, anamnese=b.get("anamnese", ""), exame_clinico=b.get("exame_clinico", ""),
         hipotese=b.get("hipotese", ""), duvida=b.get("duvida", ""), queixa=b.get("queixa", ""), criado=now(), prazo=now() + 48 * H,
-        info_pedida=None, paciente=pac, solicitante=u["id"], especialidade=b.get("especialidade", ""), unidade=u["unidade"])
+        info_pedida=None, paciente=pac, solicitante=u["id"], especialidade=b.get("especialidade", ""), unidade=u["unidade"], mensagens=[])
+    if b.get("duvida") and c["modalidade"] == "assincrona":
+        c["mensagens"].append(dict(autor=u["id"], ts=now(), texto=b["duvida"]))
     add_event(c, u, "criacao", f"{tipo.capitalize()} solicitado ao serviço de {c['especialidade'] or 'especialidade'}"
                                + (" (fluxo assíncrono, prazo de 48 h)." if c["modalidade"] == "assincrona" else " (teleatendimento síncrono)."))
     slot_id = b.get("slot")
@@ -383,6 +383,20 @@ async def case_action(request):
     elif act == "encerrar":
         c["status"] = "encerrado"
         add_event(c, u, "encerramento", "Pedido encerrado no sistema de Telessaúde.")
+    elif act == "mensagem":
+        texto = (b.get("texto") or "").strip()
+        if not texto:
+            return jr({"erro": "Mensagem vazia."}, 400)
+        c.setdefault("mensagens", []).append(dict(autor=u["id"], ts=now(), texto=texto))
+        if c["status"] == "aguardando" and u["perfil"] == "especialista":
+            c["status"] = "em_analise"
+            c["especialista"] = c["especialista"] or u["id"]
+            add_event(c, u, "analise", "Solicitação assumida para análise.")
+        pend = [c["solicitante"]] if u["id"] != c["solicitante"] else ([c["especialista"]] if c["especialista"] else [])
+        if not pend and u["id"] == c["solicitante"]:
+            pend = [x["id"] for x in DB["users"] if x["perfil"] == "especialista" and x.get("especialidade") == c["especialidade"]]
+        await notify([p for p in pend if p and p != u["id"]], f"{c['protocolo']}: nova mensagem de {u['nome']}", f"/casos/{c['id']}")
+        pend = []
     elif act == "prioridade":
         c["prioridade"] = b.get("prioridade", c["prioridade"])
         add_event(c, u, "analise", f"Prioridade alterada para {c['prioridade']}.")
@@ -430,7 +444,7 @@ async def new_ticket(request):
              status="aberto", autor=u["id"], criado=now(), respostas=[dict(autor=u["id"], ts=now(), texto=b.get("descricao", ""))] if b.get("descricao") else [])
     DB["tickets"].insert(0, t)
     audit(u, "Chamado aberto", t["titulo"], request)
-    await notify([x["id"] for x in DB["users"] if x["perfil"] == "suporte"], f"Novo chamado: {t['titulo']}", "/suporte")
+    await notify([x["id"] for x in DB["users"] if x["perfil"] == "admin"], f"Novo chamado: {t['titulo']}", "/suporte")
     save()
     await push(dict(t="state"))
     return jr(t)

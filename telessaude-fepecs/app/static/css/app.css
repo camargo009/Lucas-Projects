@@ -331,3 +331,14 @@ body { font-size: 14px; background: var(--paper); -webkit-font-smoothing: antial
 
 .t td:nth-child(2) { min-width: 180px; }
 .t td:nth-child(5) { white-space: nowrap; }
+
+.chatl { max-height: 340px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding: 4px 2px 12px; }
+.bub { max-width: 82%; align-self: flex-start; background: #eef3f9; border-radius: 4px 14px 14px 14px; padding: 9px 13px; }
+.bub.eu { align-self: flex-end; background: var(--azul); color: #fff; border-radius: 14px 4px 14px 14px; }
+.bub .bw { font-size: 12px; opacity: .85; margin-bottom: 2px; } .bub .bw span { opacity: .75; }
+.bub .bt { white-space: pre-wrap; }
+.chatc { display: flex; gap: 10px; align-items: flex-end; border-top: 1px solid var(--line-soft); padding-top: 12px; }
+.chatc textarea { flex: 1; min-height: 56px; border: 1px solid #c7d2e0; border-radius: 10px; padding: 9px 11px; resize: vertical; }
+.demo button { display: block; width: 100%; border: 1px solid var(--line); border-radius: 12px; padding: 13px 15px; margin-bottom: 10px; background: #fff; text-align: left; }
+.demo button:hover { border-color: var(--azul); background: var(--azul-claro); }
+.demo button b { font-size: 15px; color: var(--azul-esc); } .demo button .desc { margin-top: 4px; color: var(--ink-2); }
