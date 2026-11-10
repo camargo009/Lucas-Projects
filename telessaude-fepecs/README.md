@@ -23,13 +23,12 @@ cd app
 Acesse http://localhost:8080. Senha de todas as contas: `telessaude`
 (e-mails `@telessaude.fepecs`).
 
-| Perfil | Conta |
+| Perfil (conforme o termo de referência) | Conta |
 |---|---|
 | Administrador / Gestor | admin@ / gestor@ |
-| Solicitante | henrique.matos@ (HRAN), camila.reis@ (HRT) |
-| Especialista | beatriz.nogueira@ (Cardiologia), andre.lacerda@ (Nefrologia) |
-| Laudista (espirometria) | rafael.teixeira@ |
-| Enfermagem / Suporte | patricia.souza@ / suporte@ |
+| Profissional assistencial | henrique.matos@ (HRAN), livia.andrade@ (HRT), camila.reis@ (UBS 3 Ceilândia), patricia.souza@ (enfermagem, UBS 1 Planaltina) |
+| Teleconsultor | beatriz.nogueira@ (Cardiologia), andre.lacerda@ (Nefrologia), rafael.teixeira@ (Pneumologia, laudista de espirometria) |
+| Suporte técnico | suporte@ |
 
 ## Módulos (conforme documento FEPECS)
 Administrativo, Suporte, Teleinterconsultas, Teleconsulta/Telemonitoramento/Teletriagem,

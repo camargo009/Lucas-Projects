@@ -48,11 +48,12 @@ def seed():
         dict(id="u-admin", nome="Marina Duarte", email="admin@telessaude.fepecs", perfil="admin", cargo="Coordenação do Núcleo de Telessaúde", unidade="u-nuc"),
         dict(id="u-gestor", nome="Roberto Alencar", email="gestor@telessaude.fepecs", perfil="gestor", cargo="Gerência de Serviços de Telessaúde", unidade="u-nuc"),
         dict(id="u-sol1", nome="Henrique Matos", email="henrique.matos@telessaude.fepecs", perfil="solicitante", cargo="Médico residente, Clínica Médica", unidade="u-hran", crm="CRM-DF 00000"),
-        dict(id="u-sol2", nome="Camila Reis", email="camila.reis@telessaude.fepecs", perfil="solicitante", cargo="Médica, Clínica Médica", unidade="u-hrt", crm="CRM-DF 00001"),
+        dict(id="u-sol2", nome="Camila Reis", email="camila.reis@telessaude.fepecs", perfil="solicitante", cargo="Médica residente, Medicina de Família e Comunidade", unidade="u-ubs2", crm="CRM-DF 00001"),
+        dict(id="u-sol3", nome="Lívia Andrade", email="livia.andrade@telessaude.fepecs", perfil="solicitante", cargo="Médica, Clínica Médica", unidade="u-hrt", crm="CRM-DF 00005"),
         dict(id="u-esp1", nome="Beatriz Nogueira", email="beatriz.nogueira@telessaude.fepecs", perfil="especialista", cargo="Cardiologista", especialidade="Cardiologia", unidade="u-hran", crm="CRM-DF 00002"),
-        dict(id="u-esp2", nome="Rafael Teixeira", email="rafael.teixeira@telessaude.fepecs", perfil="especialista", cargo="Pneumologista", especialidade="Pneumologia", unidade="u-hmib", crm="CRM-DF 00003"),
+        dict(id="u-esp2", nome="Rafael Teixeira", email="rafael.teixeira@telessaude.fepecs", perfil="especialista", cargo="Pneumologista", especialidade="Pneumologia", unidade="u-pol", crm="CRM-DF 00003"),
         dict(id="u-esp3", nome="André Lacerda", email="andre.lacerda@telessaude.fepecs", perfil="especialista", cargo="Nefrologista", especialidade="Nefrologia", unidade="u-hrg", crm="CRM-DF 00004"),
-        dict(id="u-enf", nome="Patrícia Souza", email="patricia.souza@telessaude.fepecs", perfil="enfermagem", cargo="Enfermeira, Clínica Médica", unidade="u-hran", coren="COREN-DF 00000"),
+        dict(id="u-enf", nome="Patrícia Souza", email="patricia.souza@telessaude.fepecs", perfil="enfermagem", cargo="Enfermeira, Estratégia Saúde da Família", unidade="u-ubs1", coren="COREN-DF 00000"),
         dict(id="u-sup", nome="Thiago Ramos", email="suporte@telessaude.fepecs", perfil="suporte", cargo="Suporte técnico (BazeTech)", unidade="u-nuc"),
     ]
     units = [
@@ -98,14 +99,14 @@ def seed():
              criado=now() - 20 * H, prazo=now() + 28 * H)
     a["timeline"] = [ev("u-sol1", "criacao", "Teleparecer solicitado ao serviço de Cardiologia (fluxo assíncrono, prazo de 48 h).", a["criado"])]
 
-    b = case("teleparecer", 2, paciente="p2", solicitante="u-sol2", especialista="u-esp2", especialidade="Pneumologia", unidade="u-hrt",
+    b = case("teleparecer", 2, paciente="p2", solicitante="u-sol3", especialista="u-esp2", especialidade="Pneumologia", unidade="u-hrt",
              status="info_solicitada", queixa="Tosse crônica com hemoptise esporádica",
              anamnese="Feminina, 61 anos, ex-tabagista (30 maços/ano), internada para investigação de tosse com hemoptise esporádica há 3 semanas.",
              exame_clinico="SpO2 95% em ar ambiente, murmúrio vesicular diminuído em ápice direito. Sem febre.",
              hipotese="Suspeita de neoplasia pulmonar versus tuberculose", duvida="Quais exames complementares priorizar?",
              criado=now() - 30 * H, prazo=now() + 18 * H,
              info_pedida="Enviar laudo da radiografia de tórax e resultado da baciloscopia, se disponíveis.")
-    b["timeline"] = [ev("u-sol2", "criacao", "Teleparecer solicitado.", b["criado"] ),
+    b["timeline"] = [ev("u-sol3", "criacao", "Teleparecer solicitado.", b["criado"] ),
                      ev("u-esp2", "info", "Solicitado mais informações: enviar laudo da radiografia de tórax e resultado da baciloscopia.", now() - 6 * H)]
 
     d = case("teleparecer", 3, paciente="p5", solicitante="u-sol1", especialista="u-esp3", especialidade="Nefrologia", unidade="u-hrg",
@@ -139,11 +140,11 @@ def seed():
     f["timeline"] = [ev("u-sol2", "criacao", "Teleinterconsulta solicitada pela APS.", f["criado"]),
                      ev("u-esp3", "analise", "Solicitação assumida para análise.", now() - 5 * H)]
 
-    g = case("teletriagem", 6, paciente="p4", solicitante="u-sol2", especialidade="Pneumologia", unidade="u-ubs1", hospitalar=False,
+    g = case("teletriagem", 6, paciente="p4", solicitante="u-enf", especialidade="Pneumologia", unidade="u-ubs1", hospitalar=False,
              queixa="Tosse seca há 6 semanas", anamnese="Feminina, 33 anos, não fumante, tosse seca persistente, sem febre.",
              exame_clinico="Ausculta pulmonar normal.", hipotese="Asma de início tardio?", duvida="Encaminhar para espirometria?",
              criado=now() - 4 * H, prazo=now() + 44 * H)
-    g["timeline"] = [ev("u-sol2", "criacao", "Teletriagem solicitada.", g["criado"])]
+    g["timeline"] = [ev("u-enf", "criacao", "Teletriagem solicitada.", g["criado"])]
 
     h = case("teleconsulta", 7, paciente="p3", solicitante="u-sol2", especialista="u-esp3", especialidade="Nefrologia", unidade="u-ubs2",
              hospitalar=False, modalidade="sincrona", status="teleatendimento_agendado", queixa="Retorno de seguimento, doença renal crônica",
