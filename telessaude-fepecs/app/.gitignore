@@ -1,0 +1,5 @@
+data.json
+out.log
+err.log
+cloudflared.exe
+__pycache__/
