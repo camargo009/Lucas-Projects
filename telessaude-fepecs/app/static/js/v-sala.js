@@ -91,7 +91,7 @@ async function iniciar(room, root, opt) {
     return el;
   };
   const layout = () => { const n = vs.children.length; vs.className = "videos n" + Math.min(n, 4); $("#np").textContent = n + " participante(s)"; };
-  const PERF = { admin: "Gestor / Administrador", gestor: "Gestor", solicitante: "Médico", especialista: "Teleconsultor", enfermagem: "Enfermagem", suporte: "Suporte", paciente: "Paciente" };
+  const PERF = { admin: "Gestor / Administrador", gestor: "Gestor", solicitante: "Teleconsultor", especialista: "Médico especialista", enfermagem: "Enfermagem", suporte: "Suporte", paciente: "Paciente" };
   tile("local", opt.nome, guest ? "Paciente" : PERF[S.me.perfil], eu.stream, true);
   const marcaCam = (el, on) => el.classList.toggle("camoff", !on);
   marcaCam(vs.querySelector('[data-id="local"]'), eu.cam && eu.stream.getVideoTracks().length > 0);

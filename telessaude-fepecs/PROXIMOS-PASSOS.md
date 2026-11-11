@@ -2,7 +2,7 @@
 
 ## Estado em 10/11/2026
 - Demo funcional para apresentação de 23/11/2026, no GitHub (`camargo009/Lucas-Projects`, branch `camargo009-redcap-task-list`, pasta `telessaude-fepecs`).
-- 3 perfis (senha `telessaude`): médico (`medico@`), teleconsultor (`teleconsultor@`), gestor/administrador (`gestor@`).
+- 3 perfis (senha `telessaude`): teleconsultor (`teleconsultor@`, abre solicitações), médico especialista (`medico@`, responde), gestor/administrador (`gestor@`).
 - Fluxo 1 (Teleparecer, passos 1 a 13) implementado conforme o fluxograma oficial:
   - assíncrono por formulário (48 h), sala de teleparecer sem o médico, passo 11 (Sim: passo 12; Não: passo 13 com 4 opções).
   - troca de informações em formulário entre médico e teleconsultor, com anexos.

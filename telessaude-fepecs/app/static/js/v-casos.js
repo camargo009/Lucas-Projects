@@ -76,33 +76,33 @@ function fluxoHtml(c, m) {
   const sala = c.modo === "sala_teleparecer";
   if (c.status === "aguardando") return esp
     ? card("PASSO 10 DO FLUXOGRAMA", "Analise a solicitação enviada", "Você tem carga horária reservada para teleparecer. O prazo de resposta é de 48 horas.", `<button class="btn" data-a="assumir">Analisar solicitação</button>`)
-    : card("PASSO 10 DO FLUXOGRAMA", "Aguardando o teleconsultor", "O profissional requisitado analisa a solicitação enviada em até 48 horas.");
+    : card("PASSO 10 DO FLUXOGRAMA", "Aguardando o médico especialista", "O profissional requisitado analisa a solicitação enviada em até 48 horas.");
   if (c.status === "em_analise") return esp
     ? card("PASSO 11 DO FLUXOGRAMA", "A dúvida pode ser respondida neste primeiro acesso?", "Sim: passo 12, emita o parecer e encerre o pedido. Não: passo 13, responda no Sistema de Telessaúde marcando uma das opções.", `<button class="btn ok" data-a="p11sim">Sim, emitir parecer (passo 12)</button><div class="small muted" style="margin:14px 0 6px"><b>Não: passo 13, marque uma das opções</b></div>${[["info", "1", "Solicito mais informações (descreva as informações necessárias)"], ["sync", "2", "Favor marcar teleatendimento síncrono com a presença do paciente (horário disponível)"], ["hospitalar", "3", "Favor seguir fluxo hospitalar (já estabelecido)"], ["evoluir", "4", "Evoluir teleparecer no prontuário"]].map((o) => `<div class="opt" data-a="p13_${o[0]}"><b>${o[1]}</b><div>${o[2]}</div></div>`).join("")}`)
-    : card("PASSO 11 DO FLUXOGRAMA", "Em análise pelo teleconsultor", "O teleconsultor decide se a dúvida é respondida agora ou se pede mais informações, teleatendimento ou outro encaminhamento.");
+    : card("PASSO 11 DO FLUXOGRAMA", "Em análise pelo médico especialista", "O médico especialista decide se a dúvida é respondida agora ou se pede mais informações, teleatendimento ou outro encaminhamento.");
   if (c.status === "info_solicitada") return sol
-    ? card("PASSO 13 · OPÇÃO 1", "Anexe as informações solicitadas", `Teleconsultor pediu: ${esc(c.info_pedida || "")}`, `<button class="btn" data-a="enviar">Anexar e informar</button>`)
-    : card("PASSO 13 · OPÇÃO 1", "Aguardando o médico solicitante", "O médico deve anexar no sistema as informações solicitadas.");
+    ? card("PASSO 13 · OPÇÃO 1", "Anexe as informações solicitadas", `Médico especialista pediu: ${esc(c.info_pedida || "")}`, `<button class="btn" data-a="enviar">Anexar e informar</button>`)
+    : card("PASSO 13 · OPÇÃO 1", "Aguardando o teleconsultor", "O teleconsultor deve anexar no sistema as informações solicitadas.");
   if (c.status === "teleatendimento_agendado") {
     const t = sala
-      ? "Passo 8: no dia e hora marcados, o teleconsultor acessa o sistema e abre o link do teleatendimento. A equipe de enfermagem desloca o paciente até a sala de teleparecer e acessa o sistema. O teleatendimento é feito sem a presença do médico solicitante."
-      : "Passo 13, opção 2: teleatendimento síncrono com a presença do paciente, no horário marcado. Médico solicitante, paciente e teleconsultor entram na mesma sala.";
+      ? "Passo 8: no dia e hora marcados, o médico especialista acessa o sistema e abre o link do teleatendimento. A equipe de enfermagem desloca o paciente até a sala de teleparecer e acessa o sistema. O teleatendimento é feito sem a presença do teleconsultor solicitante."
+      : "Passo 13, opção 2: teleatendimento síncrono com a presença do paciente, no horário marcado. Teleconsultor, paciente e médico especialista entram na mesma sala.";
     return card(sala ? "PASSOS 7 E 8 DO FLUXOGRAMA" : "PASSO 13 · OPÇÃO 2", "Teleatendimento marcado", t);
   }
   if (c.status === "em_atendimento") return esp
     ? card("PASSO 13 DO FLUXOGRAMA", "Teleatendimento em andamento", "Ao terminar, registre o desfecho no sistema marcando uma das opções.", `<button class="btn" data-a="p13">Registrar desfecho (passo 13)</button>`)
-    : card("TELEATENDIMENTO", "Em andamento", sala ? "Atendimento na sala de teleparecer, com o paciente e a equipe de enfermagem, sem o médico solicitante. Use a Troca de informações abaixo para enviar dados ao teleconsultor durante o atendimento." : "Entre na sala para participar e use a Troca de informações abaixo para enviar dados ao teleconsultor.");
-  if (c.status === "respondido") return card("PASSO 12 DO FLUXOGRAMA", "Resposta registrada: encerre o pedido", "O teleconsultor assina o documento, a evolução segue para o prontuário (PEC e-SUS) e o pedido é encerrado no sistema de Telessaúde.");
+    : card("TELEATENDIMENTO", "Em andamento", sala ? "Atendimento na sala de teleparecer, com o paciente e a equipe de enfermagem, sem o teleconsultor solicitante. Use a Troca de informações abaixo para enviar dados ao médico especialista durante o atendimento." : "Entre na sala para participar e use a Troca de informações abaixo para enviar dados ao médico especialista.");
+  if (c.status === "respondido") return card("PASSO 12 DO FLUXOGRAMA", "Resposta registrada: encerre o pedido", "O médico especialista assina o documento, a evolução segue para o prontuário (PEC e-SUS) e o pedido é encerrado no sistema de Telessaúde.");
   return "";
 }
 
 function msgsHtml(c, m) {
   const ms = c.mensagens || [];
   const podeEnviar = ["solicitante", "especialista"].includes(m.perfil) && c.status !== "encerrado";
-  const lista = ms.length ? ms.map((x) => { const eu = x.autor === m.id; const u = usr(x.autor); return `<div class="trm ${eu ? "eu" : ""}"><div class="small muted"><b>${esc(u.nome)}</b> · ${u.perfil === "especialista" ? "Teleconsultor" : "Médico"} · ${dt(x.ts)}</div><div class="txtblk">${esc(x.texto)}</div>${(x.anexos || []).length ? `<div class="small">Anexos: ${x.anexos.map((a) => esc(a.nome)).join(", ")}</div>` : ""}</div>`; }).join("") : `<p class="muted small" style="margin:0">Nenhuma mensagem ainda. Médico e teleconsultor trocam informações e anexos por aqui.</p>`;
-  const nota = c.status === "info_solicitada" && m.perfil === "solicitante" ? `<div class="err" style="margin:0 0 10px">O teleconsultor aguarda sua resposta abaixo.</div>` : "";
-  const form = podeEnviar ? `${nota}<div class="fld" style="margin-top:12px"><label>${m.perfil === "solicitante" ? "Responder ou enviar informação ao teleconsultor" : "Enviar mensagem ao médico solicitante"}</label><textarea id="mt" placeholder="Escreva aqui…"></textarea></div><div class="bar" style="margin-top:8px"><input id="mf" type="file" multiple><button class="btn" id="ms">Enviar</button></div>` : "";
-  return `<div class="panel"><div class="ph"><h3>Troca de informações</h3><span class="tag azul">médico ⇄ teleconsultor</span></div><div class="pb"><div class="trlist">${lista}</div>${form}</div></div>`;
+  const lista = ms.length ? ms.map((x) => { const eu = x.autor === m.id; const u = usr(x.autor); return `<div class="trm ${eu ? "eu" : ""}"><div class="small muted"><b>${esc(u.nome)}</b> · ${u.perfil === "especialista" ? "Médico especialista" : "Teleconsultor"} · ${dt(x.ts)}</div><div class="txtblk">${esc(x.texto)}</div>${(x.anexos || []).length ? `<div class="small">Anexos: ${x.anexos.map((a) => esc(a.nome)).join(", ")}</div>` : ""}</div>`; }).join("") : `<p class="muted small" style="margin:0">Nenhuma mensagem ainda. Médico especialista e teleconsultor trocam informações e anexos por aqui.</p>`;
+  const nota = c.status === "info_solicitada" && m.perfil === "solicitante" ? `<div class="err" style="margin:0 0 10px">O médico especialista aguarda sua resposta abaixo.</div>` : "";
+  const form = podeEnviar ? `${nota}<div class="fld" style="margin-top:12px"><label>${m.perfil === "solicitante" ? "Responder ou enviar informação ao médico especialista" : "Enviar mensagem ao teleconsultor"}</label><textarea id="mt" placeholder="Escreva aqui…"></textarea></div><div class="bar" style="margin-top:8px"><input id="mf" type="file" multiple><button class="btn" id="ms">Enviar</button></div>` : "";
+  return `<div class="panel"><div class="ph"><h3>Troca de informações</h3><span class="tag azul">médico especialista ⇄ teleconsultor</span></div><div class="pb"><div class="trlist">${lista}</div>${form}</div></div>`;
 }
 
 export function detalhe(id, box) {
@@ -127,14 +127,14 @@ export function detalhe(id, box) {
     ${fluxoHtml(c, m)}
     <div class="panel"><div class="ph"><h3>Paciente e solicitação</h3></div><div class="pb"><dl class="dl">
       <dt>Paciente</dt><dd><b>${esc(p.nome)}</b> · ${idade(p.nasc)} anos · ${p.sexo === "F" ? "F" : "M"} · ${esc(c.situacao || "Internado")}</dd><dt>CNS</dt><dd class="mono">${esc(p.cns)}</dd><dt>Local</dt><dd>${esc(p.local)} · ${esc(und(c.unidade).nome)}</dd>
-      ${c.modo ? `<dt>Teleatendimento</dt><dd>${c.modo === "sala_teleparecer" ? "Sala de teleparecer, sem o médico solicitante; enfermagem acompanha o paciente" : "Síncrono, com o paciente e o médico solicitante"}</dd>` : ""}
-      <dt>Médico solicitante</dt><dd>${esc(usr(c.solicitante).nome)} <span class="muted">· ${esc(usr(c.solicitante).cargo || "")}</span></dd><dt>Teleconsultor</dt><dd>${c.especialista ? `${esc(usr(c.especialista).nome)} <span class="muted">· ${esc(c.especialidade)}</span>` : `<span class="muted">Aguardando um teleconsultor de ${esc(c.especialidade)}</span>`}</dd>
-      <dt>Seu papel</dt><dd><span class="tag azul">${m.perfil === "solicitante" ? "Você é o médico solicitante" : m.perfil === "especialista" ? "Você é o teleconsultor" : "Gestão"}</span></dd>
+      ${c.modo ? `<dt>Teleatendimento</dt><dd>${c.modo === "sala_teleparecer" ? "Sala de teleparecer, sem o teleconsultor solicitante; enfermagem acompanha o paciente" : "Síncrono, com o paciente e o teleconsultor solicitante"}</dd>` : ""}
+      <dt>Teleconsultor solicitante</dt><dd>${esc(usr(c.solicitante).nome)} <span class="muted">· ${esc(usr(c.solicitante).cargo || "")}</span></dd><dt>Médico especialista</dt><dd>${c.especialista ? `${esc(usr(c.especialista).nome)} <span class="muted">· ${esc(c.especialidade)}</span>` : `<span class="muted">Aguardando um médico especialista de ${esc(c.especialidade)}</span>`}</dd>
+      <dt>Seu papel</dt><dd><span class="tag azul">${m.perfil === "solicitante" ? "Você é o teleconsultor solicitante" : m.perfil === "especialista" ? "Você é o médico especialista" : "Gestão"}</span></dd>
       <dt>Prazo</dt><dd>${slaHtml(c)}</dd>${ag ? `<dt>Teleatendimento</dt><dd><b>${dt(ag.inicio)}</b></dd>` : ""}</dl></div></div>
     <div class="panel"><div class="ph"><h3>Dados clínicos</h3></div><div class="pb"><dl class="dl"><dt>Queixa</dt><dd>${esc(c.queixa)}</dd><dt>Anamnese</dt><dd class="txtblk">${esc(c.anamnese)}</dd><dt>Exame clínico</dt><dd class="txtblk">${esc(c.exame_clinico)}</dd><dt>Hipótese</dt><dd>${esc(c.hipotese)}</dd><dt>Dúvida</dt><dd class="txtblk">${esc(c.duvida)}</dd>${c.anexos.length ? `<dt>Anexos</dt><dd>${c.anexos.map((a) => esc(a.nome)).join(", ")}</dd>` : ""}</dl>
       ${c.info_pedida && c.status === "info_solicitada" ? `<div class="err" style="margin:12px 0 0"><b>Informação solicitada pelo especialista:</b> ${esc(c.info_pedida)}</div>` : ""}</div></div>
     ${msgsHtml(c, m)}
-    ${r ? `<div class="panel" style="border-left:4px solid var(--verde)"><div class="ph"><h3>Parecer do teleconsultor</h3><span class="tag verde">${esc(OP[r.opcao] || r.opcao)}</span></div><div class="pb"><div class="txtblk">${esc(r.texto)}</div><p class="small muted" style="margin-bottom:0">${esc(usr(r.por).nome)} · ${dt(r.ts)}${r.assinatura ? ` · <span class="tag verde">assinado</span> <span class="mono">${r.assinatura.hash.slice(0, 16)}…</span>` : ' · <span class="tag ambar">aguardando assinatura</span>'}</p></div></div>` : ""}
+    ${r ? `<div class="panel" style="border-left:4px solid var(--verde)"><div class="ph"><h3>Parecer do médico especialista</h3><span class="tag verde">${esc(OP[r.opcao] || r.opcao)}</span></div><div class="pb"><div class="txtblk">${esc(r.texto)}</div><p class="small muted" style="margin-bottom:0">${esc(usr(r.por).nome)} · ${dt(r.ts)}${r.assinatura ? ` · <span class="tag verde">assinado</span> <span class="mono">${r.assinatura.hash.slice(0, 16)}…</span>` : ' · <span class="tag ambar">aguardando assinatura</span>'}</p></div></div>` : ""}
     ${c.transcricao.length ? `<div class="panel"><div class="ph"><h3>Transcrição do teleatendimento</h3></div><div class="pb small">${c.transcricao.map((l) => `<div><b>${esc(l.autor)}:</b> ${esc(l.texto)}</div>`).join("")}</div></div>` : ""}
     </div><div class="stack">
     ${esp ? copilotoHtml(c) : ""}
@@ -175,7 +175,7 @@ function ligaDetalhe(b, c) {
     encerrar: async () => { await acao(c, "encerrar"); toast("Pedido encerrado."); },
     pec: async () => { await acao(c, "sync_pec"); toast("Evolução enviada ao PEC e-SUS."); },
     assinar: () => modal({ titulo: "Assinatura eletrônica", ok: "Assinar documento", corpo: `<p>O parecer será assinado com certificado digital ICP-Brasil (simulado) e receberá um código verificável.</p><div class="fld"><label>Certificado</label><select id="cert"><option>ICP-Brasil A3 (simulada)</option><option>Gov.br avançada (simulada)</option></select></div>`, onOk: async (m) => { await acao(c, "assinar", { tipo: m.querySelector("#cert").value }); toast("Documento assinado."); } }),
-    enviar: () => modal({ titulo: "Anexar as informações solicitadas", ok: "Enviar ao teleconsultor", corpo: `<div class="fld"><label>Informações</label><textarea id="t"></textarea></div><div class="fld"><label>Anexos</label><input id="f" type="file" multiple></div>`, onOk: async (m) => { const t = m.querySelector("#t").value.trim(); if (!t) { toast("Descreva as informações.", true); return false; } await acao(c, "enviar_info", { texto: t, anexos: [...m.querySelector("#f").files].map((f) => ({ nome: f.name, tamanho: f.size })) }); toast("Informações enviadas."); } }),
+    enviar: () => modal({ titulo: "Anexar as informações solicitadas", ok: "Enviar ao médico especialista", corpo: `<div class="fld"><label>Informações</label><textarea id="t"></textarea></div><div class="fld"><label>Anexos</label><input id="f" type="file" multiple></div>`, onOk: async (m) => { const t = m.querySelector("#t").value.trim(); if (!t) { toast("Descreva as informações.", true); return false; } await acao(c, "enviar_info", { texto: t, anexos: [...m.querySelector("#f").files].map((f) => ({ nome: f.name, tamanho: f.size })) }); toast("Informações enviadas."); } }),
     p11sim: () => {
       modal({ titulo: "Passo 12 · Emitir parecer e encerrar o pedido", lg: true, ok: "Emitir parecer", corpo: `<div class="f"><div class="pill-info">Opção: <b>Teleparecer resolvido e evoluído no prontuário eletrônico</b></div>${campoTexto("Parecer", "Use o rascunho do Copiloto como ponto de partida. A revisão é obrigatória.", c.resposta ? c.resposta.texto : "")}</div>`,
         onOk: async (m) => { const t = m.querySelector("#t").value.trim(); if (t.length < 20) { toast("Escreva o parecer completo.", true); return false; } await acao(c, "responder", { opcao: "resolvido", texto: t }); toast("Parecer emitido. Falta a assinatura eletrônica."); } });
@@ -187,13 +187,13 @@ function ligaDetalhe(b, c) {
       const OPS = [["info", "1", "Solicito mais informações (descreva as informações necessárias)"], ["sync", "2", "Favor marcar teleatendimento síncrono com a presença do paciente (horário disponível)"], ["hospitalar", "3", "Favor seguir fluxo hospitalar (já estabelecido)"], ["evoluir", "4", "Evoluir teleparecer no prontuário"]];
       const area = (op) => op === "info" ? `<div class="fld"><label>Informações necessárias</label><textarea id="t" placeholder="Ex.: enviar ECG de 12 derivações e a curva de troponina"></textarea></div>`
         : op === "sync" ? `<div id="g">${slotGrid(sl, sel)}</div>`
-        : op === "hospitalar" ? campoTexto("Orientação ao médico solicitante", "Descreva o encaminhamento pelo fluxo hospitalar já estabelecido.")
+        : op === "hospitalar" ? campoTexto("Orientação ao teleconsultor", "Descreva o encaminhamento pelo fluxo hospitalar já estabelecido.")
         : campoTexto("Evolução no prontuário", "O teleparecer será evoluído no prontuário eletrônico.", c.resposta ? c.resposta.texto : "");
       const mm = modal({ titulo: "Passo 13 · Responder no Sistema de Telessaúde", lg: true, ok: "Registrar", corpo: `<div class="opcoes13">${OPS.map((o, i) => `<label class="o13"><input type="radio" name="op13" value="${o[0]}" ${i === 0 ? "" : ""}${o[0] === ini ? "checked" : ""}><b>${o[1]}</b><span>${o[2]}</span></label>`).join("")}</div><div id="area13" style="margin-top:14px">${area(ini)}</div>`,
         onOk: async (m) => {
           const op = m.querySelector("input[name=op13]:checked").value;
           const t = (m.querySelector("#t") || {}).value?.trim();
-          if (op === "info") { if (!t) { toast("Descreva a informação necessária.", true); return false; } await acao(c, "solicitar_info", { texto: t }); toast("Pedido enviado ao médico solicitante."); }
+          if (op === "info") { if (!t) { toast("Descreva a informação necessária.", true); return false; } await acao(c, "solicitar_info", { texto: t }); toast("Pedido enviado ao teleconsultor."); }
           else if (op === "sync") { if (!sel) { toast("Selecione um horário.", true); return false; } await acao(c, "agendar", { slot: sel }); toast("Teleatendimento marcado."); }
           else { if (!t || t.length < 20) { toast("Escreva o texto completo.", true); return false; } await acao(c, "responder", { opcao: op, texto: t }); toast("Resposta registrada. Falta a assinatura eletrônica."); }
         } });

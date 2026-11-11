@@ -41,7 +41,7 @@ function desenha(b) {
   } else if (w.step === "p5") {
     corpo = passo(5, "O teleparecer pode ser assíncrono?", "A resposta do especialista pode ser dada sem teleatendimento em tempo real, com prazo de até 48 horas?", [["sim", "Sim, solicitar teleconsultoria assíncrona"], ["nao", "Não, é preciso um teleatendimento"]]);
   } else if (w.step === "p6") {
-    corpo = passo(6, "O paciente tem condições de ser deslocado até a sala de teleparecer?", "Para realizar teleatendimento diretamente com o especialista requisitado, sem a presença do médico solicitante ou plantonista.", [["sim", "Sim, solicitar agenda de teleconsulta hospitalar"], ["nao", "Não, o pedido segue para análise do especialista"]]);
+    corpo = passo(6, "O paciente tem condições de ser deslocado até a sala de teleparecer?", "Para realizar teleatendimento diretamente com o especialista requisitado, sem a presença do teleconsultor solicitante ou plantonista.", [["sim", "Sim, solicitar agenda de teleconsulta hospitalar"], ["nao", "Não, o pedido segue para análise do especialista"]]);
   } else if (w.step === "agenda") {
     const sl = S.d.slots.filter((s) => s.status === "livre" && usr(s.especialista).especialidade === w.especialidade);
     corpo = `<div class="panel"><div class="ph"><h3>Passo 7 · Agenda de teleconsulta hospitalar · ${esc(w.especialidade)}</h3></div><div class="pb"><p class="small muted" style="margin-top:0">Escolha o horário disponibilizado pelo especialista. No dia e hora marcados, a equipe de enfermagem desloca o paciente à sala de teleparecer e acessa o sistema.</p>${slotGrid(sl, w.slot)}<div class="bar end" style="margin-top:14px"><button class="btn sec" id="w-back">Voltar</button><button class="btn" id="w-next" ${w.slot ? "" : "disabled"}>Reservar e preencher a solicitação</button></div></div></div>`;
@@ -57,7 +57,7 @@ function desenha(b) {
       </div><div class="bar end" style="margin-top:16px"><button class="btn sec" id="w-back">Voltar</button><button class="btn" id="w-next">Revisar</button></div></div></div>`;
   } else if (w.step === "rev") {
     const d = w.dados, a = analisar({ ...d, paciente: w.paciente, especialidade: w.especialidade });
-    const caminho = w.modalidade === "sincrona" ? "Teleconsulta hospitalar na sala de teleparecer, sem a presença do médico solicitante (passos 6 a 8)" : w.semDeslocamento ? "Paciente não pode ser deslocado: o especialista analisa o pedido em até 48 h (passo 6 → 10)" : "Teleconsultoria assíncrona, resposta do especialista em até 48 h (passos 5, 9 e 10)";
+    const caminho = w.modalidade === "sincrona" ? "Teleconsulta hospitalar na sala de teleparecer, sem a presença do teleconsultor solicitante (passos 6 a 8)" : w.semDeslocamento ? "Paciente não pode ser deslocado: o especialista analisa o pedido em até 48 h (passo 6 → 10)" : "Teleconsultoria assíncrona, resposta do especialista em até 48 h (passos 5, 9 e 10)";
     corpo = `<div class="grid g-main"><div class="panel"><div class="ph"><h3>Revisão da solicitação</h3></div><div class="pb"><dl class="dl">
       <dt>Caminho no fluxo</dt><dd>${caminho}</dd><dt>Especialidade</dt><dd>${esc(w.especialidade)}</dd><dt>Paciente</dt><dd>${esc(nomePac)} · ${esc(w.situacao)}</dd><dt>Prioridade</dt><dd>${priTag(w.prioridade)}</dd>
       <dt>Queixa</dt><dd>${esc(d.queixa)}</dd><dt>Anamnese</dt><dd class="txtblk">${esc(d.anamnese)}</dd><dt>Exame clínico</dt><dd class="txtblk">${esc(d.exame_clinico)}</dd><dt>Hipótese</dt><dd>${esc(d.hipotese)}</dd><dt>Dúvida</dt><dd class="txtblk">${esc(d.duvida)}</dd></dl>
@@ -117,7 +117,7 @@ function liga(b) {
       const c = await api("/cases", body);
       W = null;
       await carregar();
-      toast("Solicitação " + c.protocolo + " enviada ao teleconsultor.");
+      toast("Solicitação " + c.protocolo + " enviada ao médico especialista.");
       location.hash = "#/casos/" + c.id;
     } catch (e) { toast(e.message, true); send.disabled = false; }
   };

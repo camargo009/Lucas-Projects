@@ -8,8 +8,9 @@
 ## Perfis (somente 3, a pedido do Lucas)
 | Perfil | Login (senha `telessaude`) | Papel |
 |---|---|---|
-| Médico (solicitante) | medico@telessaude.fepecs — Dr. Henrique Matos | abre o caso, responde pedidos de informação, participa do atendimento |
-| Teleconsultor (especialista) | teleconsultor@telessaude.fepecs — Dra. Beatriz Nogueira | assume o caso, pede informações, agenda, atende, emite parecer |
+| Teleconsultor (solicitante) | teleconsultor@telessaude.fepecs — Dra. Beatriz Nogueira (HRAN) | abre o caso (passos 1–9), responde pedidos de informação, participa do atendimento |
+| Médico especialista | medico@telessaude.fepecs — Dr. Henrique Matos (Cardiologia) | assume o caso, pede informações, agenda, atende, emite parecer |
+(Decisão de 11/11: o teleconsultor abre a solicitação ao médico especialista. Internamente os perfis continuam `solicitante` e `especialista`; só rótulos e contas foram trocados.)
 | Gestor/Administrador | gestor@telessaude.fepecs — Marina Duarte | agenda, usuários, integrações, visão geral |
 - Enfermagem não tem login (apenas link/QR e nota).
 - Não incluir consulta assíncrona via chat como fluxo próprio: o Lucas pediu só os 3 perfis e o fluxo do fluxograma.

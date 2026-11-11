@@ -46,8 +46,8 @@ def at(days=0, hour=9, minute=0):
 def seed():
     users = [
         dict(id="u-admin", nome="Marina Duarte", email="gestor@telessaude.fepecs", perfil="admin", cargo="Gestora e administradora do Núcleo de Telessaúde", unidade="u-nuc"),
-        dict(id="u-sol1", nome="Dr. Henrique Matos", email="medico@telessaude.fepecs", perfil="solicitante", cargo="Médico assistente, Clínica Médica", unidade="u-hran", crm="CRM-DF 00000"),
-        dict(id="u-esp1", nome="Dra. Beatriz Nogueira", email="teleconsultor@telessaude.fepecs", perfil="especialista", cargo="Teleconsultora, Cardiologia", especialidade="Cardiologia", unidade="u-pol", crm="CRM-DF 00002"),
+        dict(id="u-sol1", nome="Dra. Beatriz Nogueira", email="teleconsultor@telessaude.fepecs", perfil="solicitante", cargo="Teleconsultora, HRAN", unidade="u-hran", crm="CRM-DF 00000"),
+        dict(id="u-esp1", nome="Dr. Henrique Matos", email="medico@telessaude.fepecs", perfil="especialista", cargo="Médico especialista, Cardiologia", especialidade="Cardiologia", unidade="u-pol", crm="CRM-DF 00002"),
     ]
     units = [
         dict(id="u-nuc", nome="Núcleo de Telessaúde FEPECS/SES-DF", tipo="Gestão", regiao="Asa Norte", cnes="—"),
@@ -131,7 +131,7 @@ def seed():
              exame_clinico="PA 164/102, IMC 31, sem edema, ausculta cardíaca normal.", hipotese="Hipertensão resistente",
              duvida="Investigar causas secundárias? Qual o próximo passo terapêutico?", criado=now() - 26 * H, prazo=now() + 22 * H)
     f["timeline"] = [ev("u-sol1", "criacao", "Teleparecer solicitado (assíncrono, prazo de 48 h).", f["criado"]),
-                     ev("u-esp1", "analise", "Solicitação em análise pelo teleconsultor.", now() - 5 * H)]
+                     ev("u-esp1", "analise", "Solicitação em análise pelo médico especialista.", now() - 5 * H)]
 
     g = case("teleparecer", 6, paciente="p4", solicitante="u-sol1", especialista="u-esp1", especialidade="Cardiologia", unidade="u-hran",
              status="teleatendimento_agendado", modalidade="sincrona", modo="sala_teleparecer", situacao="Em processo de internação",
@@ -161,7 +161,7 @@ def seed():
     tickets = [
         dict(id="t1", titulo="Não consigo anexar PDF acima de 10 MB", categoria="Anexos", prioridade="Média", status="aberto", autor="u-sol1",
              criado=now() - 6 * H, respostas=[dict(autor="u-admin", ts=now() - 5 * H, texto="O limite do piloto é 10 MB por arquivo. Comprima o PDF ou divida em duas partes.")]),
-        dict(id="t2", titulo="Cadastro de novo teleconsultor de Nefrologia", categoria="Acesso", prioridade="Baixa", status="em_atendimento", autor="u-esp1",
+        dict(id="t2", titulo="Cadastro de novo médico especialista de Nefrologia", categoria="Acesso", prioridade="Baixa", status="em_atendimento", autor="u-esp1",
              criado=now() - 2 * D, respostas=[]),
     ]
     meetings = [
@@ -275,7 +275,7 @@ def add_event(c, user, tipo, texto):
 async def create_case(request):
     u = auth(request)
     if u["perfil"] != "solicitante":
-        return jr({"erro": "Somente o médico solicitante abre teleparecer."}, 403)
+        return jr({"erro": "Somente o teleconsultor abre teleparecer."}, 403)
     b = await request.json()
     tipo = "teleparecer"
     DB["contador"] += 1
@@ -326,13 +326,13 @@ async def case_action(request):
     pend = []
     so_esp = {"assumir", "solicitar_info", "agendar", "iniciar_atendimento", "salvar_transcricao", "responder", "assinar"}
     if act in so_esp and u["perfil"] != "especialista":
-        return jr({"erro": "Ação exclusiva do teleconsultor."}, 403)
+        return jr({"erro": "Ação exclusiva do médico especialista."}, 403)
     if act == "enviar_info" and u["perfil"] != "solicitante":
-        return jr({"erro": "Ação exclusiva do médico solicitante."}, 403)
+        return jr({"erro": "Ação exclusiva do teleconsultor."}, 403)
     c.setdefault("mensagens", [])
     if act == "mensagem":
         if u["perfil"] not in ("solicitante", "especialista"):
-            return jr({"erro": "Apenas o médico e o teleconsultor trocam informações."}, 403)
+            return jr({"erro": "Apenas o teleconsultor e o médico especialista trocam informações."}, 403)
         if c["status"] in ("encerrado",):
             return jr({"erro": "Pedido encerrado."}, 409)
         txt = (b.get("texto") or "").strip()
@@ -348,7 +348,7 @@ async def case_action(request):
     elif act == "assumir":
         c["especialista"] = u["id"]
         c["status"] = "em_analise"
-        add_event(c, u, "analise", "Solicitação analisada pelo teleconsultor (passo 10).")
+        add_event(c, u, "analise", "Solicitação analisada pelo médico especialista (passo 10).")
         pend = [c["solicitante"]]
     elif act == "solicitar_info":
         c["status"] = "info_solicitada"
@@ -361,7 +361,7 @@ async def case_action(request):
         c["status"] = "em_analise"
         c["anexos"] += b.get("anexos", [])
         c["mensagens"].append(dict(ts=now(), autor=u["id"], texto=b.get("texto", ""), anexos=b.get("anexos", [])))
-        add_event(c, u, "info", "Informações solicitadas anexadas pelo médico: " + b.get("texto", ""))
+        add_event(c, u, "info", "Informações solicitadas anexadas pelo teleconsultor: " + b.get("texto", ""))
         pend = [c["especialista"]] if c["especialista"] else []
     elif act == "agendar":
         s = next((x for x in DB["slots"] if x["id"] == b.get("slot") and x["status"] == "livre"), None)

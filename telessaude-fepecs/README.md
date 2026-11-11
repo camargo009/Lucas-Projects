@@ -25,8 +25,8 @@ Acesse http://localhost:8080. Senha de todas as contas: `telessaude`
 
 | Perfil | Conta | Papel |
 |---|---|---|
-| Médico | medico@ (Dr. Henrique Matos, HRAN) | Solicita o teleparecer (Fluxo 1, passos 1 a 9), anexa informações pedidas |
-| Teleconsultor | teleconsultor@ (Dra. Beatriz Nogueira, Cardiologia) | Analisa (passo 10), decide nos passos 11 a 13, atende o paciente na sala, emite e assina o parecer |
+| Teleconsultor (solicita) | teleconsultor@ (Dra. Beatriz Nogueira, HRAN) | Abre o teleparecer (Fluxo 1, passos 1 a 9), anexa informações pedidas, participa do teleatendimento |
+| Médico especialista (responde) | medico@ (Dr. Henrique Matos, Cardiologia) | Analisa (passo 10), decide nos passos 11 a 13, atende o paciente na sala, emite e assina o parecer |
 | Gestor / Administrador | gestor@ (Marina Duarte) | Cadastros, agenda, auditoria, integrações, suporte |
 
 ## Módulos (conforme documento FEPECS)
@@ -35,13 +35,13 @@ Teleconsultoria/Teleparecer (Fluxo 1 completo), Telereuniões, Telediagnóstico 
 Interface PEC e-SUS (FHIR Bundle simulado), Assinatura eletrônica (verificação por QR).
 
 ## Roteiro sugerido
-1. Médico → **Nova solicitação** → responde o Fluxo 1 (passo 5 "Sim" = assíncrono, formulário com resposta em até 48 h) → envia.
-2. Teleconsultor → assume (passo 10) → passo 11: **Sim** emite o parecer; **Não** abre o passo 13 com as 4 opções (mais informações, teleatendimento síncrono, fluxo hospitalar, evoluir no prontuário).
-3. Caminho presencial no hospital: no passo 6 "Sim" o médico agenda a teleconsulta; o teleconsultor atende o paciente na sala **sem o médico**, com enfermagem ajudando (link/QR do caso).
-   Para vídeo remoto, o dev abre a URL pública como Beatriz.
-4. Beatriz emite parecer (use o rascunho do Copiloto), assina, envia ao PEC e encerra.
+1. Teleconsultor → **Nova solicitação** → responde o Fluxo 1 (passo 5 "Sim" = assíncrono, formulário com resposta em até 48 h) → envia.
+2. Médico especialista → assume (passo 10) → passo 11: **Sim** emite o parecer; **Não** abre o passo 13 com as 4 opções (mais informações, teleatendimento síncrono, fluxo hospitalar, evoluir no prontuário).
+3. Caminho presencial no hospital: no passo 6 "Sim" o teleconsultor agenda a teleconsulta; o médico especialista atende o paciente na sala **sem o teleconsultor**, com enfermagem ajudando (link/QR do caso).
+   Para vídeo remoto, o dev abre a URL pública como Dr. Henrique.
+4. Dr. Henrique emite parecer (use o rascunho do Copiloto), assina, envia ao PEC e encerra.
 5. Mostrar documento impresso e a verificação pelo QR.
-6. Telediagnóstico: teleconsultor lauda a espirometria. Gestor → Auditoria.
+6. Telediagnóstico: médico especialista lauda a espirometria. Gestor → Auditoria.
 
 ## Vídeo remoto
 Câmera exige HTTPS: use o túnel do `iniciar.ps1`. No caso, "Definir URL pública"
