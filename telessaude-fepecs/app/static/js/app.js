@@ -19,6 +19,12 @@ const ITEM = {
 const GRUPO = { painel: "Atendimento", novo: "Atendimento", casos: "Atendimento", agenda: "Atendimento", reunioes: "Teleeducação e reuniões", telediagnostico: "Diagnóstico", suporte: "Gestão do serviço", admin: "Gestão do serviço", integracoes: "Gestão do serviço", fluxo: "Referência" };
 
 const $app = () => document.getElementById("app");
+document.addEventListener("click", (e) => {
+  const k = e.target.closest && e.target.closest(".kpi[data-go]");
+  if (!k) return;
+  if (k.dataset.go === "laudo") { O.setExFiltro("aguardando"); location.hash = "#/telediagnostico"; }
+  else { V.setFiltro({ k: k.dataset.go }); location.hash = "#/casos"; }
+});
 let atual = null;
 
 function rota() {
@@ -109,10 +115,10 @@ function painel() {
   const exAg = d.exams.filter((e) => e.status === "aguardando").length;
   const frase = m.perfil === "especialista" ? "Fila de solicitações da sua especialidade e próximos teleatendimentos." : ["solicitante", "enfermagem"].includes(m.perfil) ? "Acompanhe suas solicitações e responda pedidos de informação." : "Visão consolidada da operação da rede de telessaúde.";
   return pageHead(`Bom dia, ${esc(m.nome.split(" ")[0])}`, frase, ["solicitante", "enfermagem"].includes(m.perfil) ? `<a class="btn" href="#/novo">${ic.plus} Nova solicitação</a>` : "") +
-    `<div class="kpis"><div class="kpi"><div class="n">${aberto.length}</div><div class="l">Solicitações abertas</div><div class="d">${cs.length} no total</div></div>
-    <div class="kpi"><div class="n">${atrasados}</div><div class="l">Fora do prazo</div><div class="d">prazo de 48 h</div></div>
-    <div class="kpi"><div class="n">${agend.length}</div><div class="l">Teleatendimentos agendados</div><div class="d">${agend[0] ? "próximo " + dsh(agend[0].agendamento.inicio) : "nenhum"}</div></div>
-    <div class="kpi"><div class="n">${exAg}</div><div class="l">Exames aguardando laudo</div><div class="d">${respondidos} solicitações respondidas</div></div></div>
+    `<div class="kpis"><a class="kpi" data-go="abertas"><div class="n">${aberto.length}</div><div class="l">Solicitações abertas</div><div class="d">${cs.length} no total</div></a>
+    <a class="kpi" data-go="atrasadas"><div class="n">${atrasados}</div><div class="l">Fora do prazo</div><div class="d">prazo de 48 h</div></a>
+    <a class="kpi" data-go="agendadas"><div class="n">${agend.length}</div><div class="l">Teleatendimentos agendados</div><div class="d">${agend[0] ? "próximo " + dsh(agend[0].agendamento.inicio) : "nenhum"}</div></a>
+    <a class="kpi" data-go="laudo"><div class="n">${exAg}</div><div class="l">Exames aguardando laudo</div><div class="d">${respondidos} solicitações respondidas</div></a></div>
     <div class="grid g-main"><div class="stack"><div class="panel"><div class="ph"><h3>${m.perfil === "especialista" ? "Fila de trabalho" : "Solicitações em andamento"}</h3><a href="#/casos" class="small">Ver todas</a></div>
       ${tabela(fila)}</div>
       <div class="panel"><div class="ph"><h3>Solicitações por modalidade</h3></div><div class="pb">${barras}</div></div></div>

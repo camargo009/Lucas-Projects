@@ -80,14 +80,19 @@ function curva(canvas, p) {
   ctx.fillStyle = "#0a4a82"; ctx.fillText("medido", W - 90, 24); ctx.fillStyle = "#78808a"; ctx.fillText("previsto", W - 90, 38);
 }
 
+let exFiltro = "";
+export function setExFiltro(v) { exFiltro = v; }
+window.addEventListener("hashchange", () => { if (!location.hash.startsWith("#/telediagnostico")) exFiltro = ""; });
 export function telediagnostico() {
   const pn = S.me.especialidade === "Pneumologia";
   const pode = ["solicitante", "enfermagem", "admin"].includes(S.me.perfil);
-  const ex = S.d.exams;
+  const ex = S.d.exams.filter((e) => !exFiltro || e.status === exFiltro);
   return {
     html: pageHead("Telediagnóstico · Espirometria", "Exames realizados na rede, laudados remotamente por pneumologistas.", pode ? `<button class="btn" id="ne">${ic.plus} Enviar espirometria</button>` : "") +
-      `<div class="panel"><table class="t"><thead><tr><th>Exame</th><th>Paciente</th><th>Unidade de coleta</th><th>CVF</th><th>VEF1</th><th>VEF1/CVF</th><th>Situação</th></tr></thead><tbody>${ex.map((e) => `<tr class="row" data-e="${e.id}"><td class="mono">${e.id}<div class="small muted">${dsh(e.solicitado)}</div></td><td>${esc(pac(e.paciente).nome)}</td><td>${esc(und(e.coleta).nome.replace(/\s*\(.*\)/, ""))}</td><td class="mono">${e.params.cvf.toFixed(2)} L</td><td class="mono">${e.params.vef1.toFixed(2)} L</td><td class="mono">${((e.params.vef1 / e.params.cvf) * 100).toFixed(0)}%</td><td><span class="st ${e.status === "laudado" ? "laudado" : "aguardando"}">${e.status === "laudado" ? "Laudado" : "Aguardando laudo"}</span></td></tr>`).join("")}</tbody></table></div>`,
+      `${exFiltro ? '<div class="chipf">Filtro: <b>Aguardando laudo</b> <button id="fx" class="btn sm sec">Limpar filtro ✕</button></div>' : ""}<div class="panel"><table class="t"><thead><tr><th>Exame</th><th>Paciente</th><th>Unidade de coleta</th><th>CVF</th><th>VEF1</th><th>VEF1/CVF</th><th>Situação</th></tr></thead><tbody>${ex.map((e) => `<tr class="row" data-e="${e.id}"><td class="mono">${e.id}<div class="small muted">${dsh(e.solicitado)}</div></td><td>${esc(pac(e.paciente).nome)}</td><td>${esc(und(e.coleta).nome.replace(/\s*\(.*\)/, ""))}</td><td class="mono">${e.params.cvf.toFixed(2)} L</td><td class="mono">${e.params.vef1.toFixed(2)} L</td><td class="mono">${((e.params.vef1 / e.params.cvf) * 100).toFixed(0)}%</td><td><span class="st ${e.status === "laudado" ? "laudado" : "aguardando"}">${e.status === "laudado" ? "Laudado" : "Aguardando laudo"}</span></td></tr>`).join("")}</tbody></table></div>`,
     after: (b) => {
+      const fx = b.querySelector("#fx");
+      if (fx) fx.onclick = () => { exFiltro = ""; location.reload(); };
       b.querySelectorAll("tr[data-e]").forEach((tr) => (tr.onclick = () => abrirExame(ex.find((x) => x.id === tr.dataset.e), pn)));
       const ne = b.querySelector("#ne");
       if (ne) ne.onclick = () => modal({ titulo: "Enviar espirometria para laudo", ok: "Enviar", corpo: `<div class="f c2"><div class="fld span2"><label>Paciente</label><select id="p">${S.d.patients.map((p) => `<option value="${p.id}">${esc(p.nome)}</option>`).join("")}</select></div>

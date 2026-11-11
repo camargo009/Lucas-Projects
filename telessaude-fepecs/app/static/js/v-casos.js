@@ -7,21 +7,32 @@ export function tabela(lista) {
   return `<table class="t"><thead><tr><th>Protocolo</th><th>Paciente</th><th>Modalidade</th><th>Especialidade</th><th>Situação</th><th>Prazo</th></tr></thead><tbody>${lista.map((c) => `<tr class="row ${priCls(c.prioridade)}" onclick="location.hash='#/casos/${c.id}'"><td><span class="mono">${c.protocolo}</span><div>${priTag(c.prioridade)}</div></td><td>${esc(pac(c.paciente).nome)}<div class="small muted">${esc(und(c.unidade).nome.replace(/\s*\(.*\)/, ""))}</div></td><td>${TIPO[c.tipo]}</td><td>${esc(c.especialidade)}</td><td>${stHtml(c.status)}</td><td>${slaHtml(c)}</td></tr>`).join("")}</tbody></table>`;
 }
 
-let filtro = { q: "", tipo: "", st: "" };
+let filtro = { q: "", tipo: "", st: "", k: "" };
+export function setFiltro(f) { filtro = { q: "", tipo: "", st: "", k: "", ...f }; }
+window.addEventListener("hashchange", () => { if (!location.hash.startsWith("#/casos")) filtro.k = ""; });
+const KFILTROS = {
+  abertas: ["Solicitações abertas", (c) => !["respondido", "encerrado"].includes(c.status)],
+  atrasadas: ["Fora do prazo", (c) => !["respondido", "encerrado"].includes(c.status) && c.prazo && c.prazo < S.d.now],
+  agendadas: ["Teleatendimentos agendados", (c) => c.agendamento && c.agendamento.fim > S.d.now && c.status !== "encerrado"],
+  respondidas: ["Solicitações respondidas", (c) => ["respondido", "encerrado"].includes(c.status)],
+};
 export function lista(_, box) {
   const m = S.me;
   let cs = S.d.cases;
   if (["solicitante", "enfermagem"].includes(m.perfil)) cs = cs.filter((c) => c.solicitante === m.id || c.unidade === m.unidade);
   if (m.perfil === "especialista") cs = cs.filter((c) => c.especialista === m.id || c.especialidade === m.especialidade);
   const f = filtro;
-  const vis = cs.filter((c) => (!f.tipo || c.tipo === f.tipo) && (!f.st || c.status === f.st) && (!f.q || (c.protocolo + pac(c.paciente).nome + c.queixa).toLowerCase().includes(f.q.toLowerCase())));
+  const kf = KFILTROS[f.k];
+  const vis = cs.filter((c) => (!kf || kf[1](c)) && (!f.tipo || c.tipo === f.tipo) && (!f.st || c.status === f.st) && (!f.q || (c.protocolo + pac(c.paciente).nome + c.queixa).toLowerCase().includes(f.q.toLowerCase())));
   return {
     html: pageHead("Solicitações", "Teleparecer, teleinterconsulta, teleconsulta, teletriagem e demais modalidades.", ["solicitante", "enfermagem"].includes(m.perfil) ? `<a class="btn" href="#/novo">${ic.plus} Nova solicitação</a>` : "") +
-      `<div class="panel"><div class="ph"><div class="bar"><input id="fq" placeholder="Buscar protocolo, paciente ou queixa" value="${esc(f.q)}" style="padding:5px 8px;border:1px solid #b5b0a4;width:280px">
+      (kf ? `<div class="chipf">Filtro: <b>${kf[0]}</b> <button id="fk" class="btn sm sec">Limpar filtro ✕</button></div>` : "") + `<div class="panel"><div class="ph"><div class="bar"><input id="fq" placeholder="Buscar protocolo, paciente ou queixa" value="${esc(f.q)}" style="padding:5px 8px;border:1px solid #b5b0a4;width:280px">
       <select id="ft" style="padding:5px;border:1px solid #b5b0a4"><option value="">Todas as modalidades</option>${Object.entries(TIPO).map(([k, v]) => `<option value="${k}" ${f.tipo === k ? "selected" : ""}>${v}</option>`).join("")}</select>
       <select id="fs" style="padding:5px;border:1px solid #b5b0a4"><option value="">Todas as situações</option>${Object.entries(STATUS).map(([k, v]) => `<option value="${k}" ${f.st === k ? "selected" : ""}>${v}</option>`).join("")}</select></div><span class="small muted">${vis.length} registro(s)</span></div>${tabela(vis)}</div>`,
     after: (b) => {
-      const up = () => { filtro = { q: b.querySelector("#fq").value, tipo: b.querySelector("#ft").value, st: b.querySelector("#fs").value }; };
+      const up = () => { filtro = { q: b.querySelector("#fq").value, tipo: b.querySelector("#ft").value, st: b.querySelector("#fs").value, k: filtro.k }; };
+      const fk = b.querySelector("#fk");
+      if (fk) fk.onclick = () => { filtro.k = ""; const r = lista(); b.innerHTML = r.html; r.after(b); };
       b.querySelector("#fq").oninput = (e) => { up(); clearTimeout(lista.t); lista.t = setTimeout(() => { const pos = e.target.selectionStart; const r = lista(); b.innerHTML = r.html; r.after(b); const i = b.querySelector("#fq"); i.focus(); i.setSelectionRange(pos, pos); }, 250); };
       b.querySelector("#ft").onchange = b.querySelector("#fs").onchange = () => { up(); const r = lista(); b.innerHTML = r.html; r.after(b); };
     },
