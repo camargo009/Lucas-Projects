@@ -38,7 +38,9 @@
 3. Fluxo confuso → reescrito seguindo o fluxograma (commit d3877ac).
 4. O médico não conseguia interagir → criada **troca de informações** (mensagens + anexos) entre médico e teleconsultor, funcionando via formulário. Vídeo pode ser simulado.
 5. Sentiu falta do **passo 13** → passo 11 mostra "Sim, emitir parecer (passo 12)" e 4 cards para o 13: pedir/enviar mais informações, teleatendimento síncrono, encaminhamento hospitalar, evolução do caso (commit 96658a8).
-
+6. KPIs do painel clicáveis (abrem a lista filtrada: abertas, atrasadas, agendadas, respondidas, exames aguardando laudo) (commit 52b34e2).
+7. Teleconsultor abre a solicitação; médico especialista responde (commit e3895ea).
+8. **A tela NÃO deve mostrar "Passo N", "Opção N" ou "fluxograma"**: o usuário não precisa saber em que passo está. A lógica/regras do fluxo continuam iguais. Removidos também o menu "Fluxo do teleparecer" e o link "Ver diagrama completo" (commit 736605c). Ao criar textos novos, não cite números de passo.
 ## Suposições NÃO confirmadas (validar com o Lucas)
 - Passo 11 "Sim" → 12 (parecer) e "Não" → 13.
 - Após o teleatendimento do passo 8, o especialista registra o passo 13.

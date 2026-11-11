@@ -1,5 +1,9 @@
 # Telessaúde FEPECS: estado atual e próximos passos
 
+## Estado em 11/11/2026
+- Última atualização: números de passo/fluxograma ocultos na interface (regras mantidas); menu "Fluxo do teleparecer" removido; KPIs clicáveis; teleconsultor abre e médico especialista responde.
+- Pendente: testar ponta a ponta os formulários das 4 opções do "Não", confirmar se "Sim" também passa pelas opções, logo oficial, deploy online.
+
 ## Estado em 10/11/2026
 - Demo funcional para apresentação de 23/11/2026, no GitHub (`camargo009/Lucas-Projects`, branch `camargo009-redcap-task-list`, pasta `telessaude-fepecs`).
 - 3 perfis (senha `telessaude`): teleconsultor (`teleconsultor@`, abre solicitações), médico especialista (`medico@`, responde), gestor/administrador (`gestor@`).
