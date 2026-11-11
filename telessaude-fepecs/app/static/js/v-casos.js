@@ -72,25 +72,25 @@ function fhir(c) {
 
 function fluxoHtml(c, m) {
   const esp = m.perfil === "especialista", sol = m.perfil === "solicitante";
-  const card = (n, t, p, bt = "") => `<div class="decisao" style="margin-bottom:16px"><div class="n">${n}</div><div class="q">${t}</div><p style="margin:0 0 10px;color:var(--ink-2)">${p}</p>${bt}</div>`;
+  const card = (n, t, p, bt = "") => `<div class="decisao" style="margin-bottom:16px"><div class="q">${t}</div><p style="margin:0 0 10px;color:var(--ink-2)">${p}</p>${bt}</div>`;
   const sala = c.modo === "sala_teleparecer";
   if (c.status === "aguardando") return esp
     ? card("PASSO 10 DO FLUXOGRAMA", "Analise a solicitação enviada", "Você tem carga horária reservada para teleparecer. O prazo de resposta é de 48 horas.", `<button class="btn" data-a="assumir">Analisar solicitação</button>`)
     : card("PASSO 10 DO FLUXOGRAMA", "Aguardando o médico especialista", "O profissional requisitado analisa a solicitação enviada em até 48 horas.");
   if (c.status === "em_analise") return esp
-    ? card("PASSO 11 DO FLUXOGRAMA", "A dúvida pode ser respondida neste primeiro acesso?", "Sim: passo 12, emita o parecer e encerre o pedido. Não: passo 13, responda no Sistema de Telessaúde marcando uma das opções.", `<button class="btn ok" data-a="p11sim">Sim, emitir parecer (passo 12)</button><div class="small muted" style="margin:14px 0 6px"><b>Não: passo 13, marque uma das opções</b></div>${[["info", "1", "Solicito mais informações (descreva as informações necessárias)"], ["sync", "2", "Favor marcar teleatendimento síncrono com a presença do paciente (horário disponível)"], ["hospitalar", "3", "Favor seguir fluxo hospitalar (já estabelecido)"], ["evoluir", "4", "Evoluir teleparecer no prontuário"]].map((o) => `<div class="opt" data-a="p13_${o[0]}"><b>${o[1]}</b><div>${o[2]}</div></div>`).join("")}`)
+    ? card("PASSO 11 DO FLUXOGRAMA", "A dúvida pode ser respondida neste primeiro acesso?", "Sim: emita o parecer e encerre o pedido. Não: responda no Sistema de Telessaúde marcando uma das opções.", `<button class="btn ok" data-a="p11sim">Sim, emitir parecer</button><div class="small muted" style="margin:14px 0 6px"><b>Não: marque uma das opções</b></div>${[["info", "1", "Solicito mais informações (descreva as informações necessárias)"], ["sync", "2", "Favor marcar teleatendimento síncrono com a presença do paciente (horário disponível)"], ["hospitalar", "3", "Favor seguir fluxo hospitalar (já estabelecido)"], ["evoluir", "4", "Evoluir teleparecer no prontuário"]].map((o) => `<div class="opt" data-a="p13_${o[0]}"><b>${o[1]}</b><div>${o[2]}</div></div>`).join("")}`)
     : card("PASSO 11 DO FLUXOGRAMA", "Em análise pelo médico especialista", "O médico especialista decide se a dúvida é respondida agora ou se pede mais informações, teleatendimento ou outro encaminhamento.");
   if (c.status === "info_solicitada") return sol
     ? card("PASSO 13 · OPÇÃO 1", "Anexe as informações solicitadas", `Médico especialista pediu: ${esc(c.info_pedida || "")}`, `<button class="btn" data-a="enviar">Anexar e informar</button>`)
     : card("PASSO 13 · OPÇÃO 1", "Aguardando o teleconsultor", "O teleconsultor deve anexar no sistema as informações solicitadas.");
   if (c.status === "teleatendimento_agendado") {
     const t = sala
-      ? "Passo 8: no dia e hora marcados, o médico especialista acessa o sistema e abre o link do teleatendimento. A equipe de enfermagem desloca o paciente até a sala de teleparecer e acessa o sistema. O teleatendimento é feito sem a presença do teleconsultor solicitante."
-      : "Passo 13, opção 2: teleatendimento síncrono com a presença do paciente, no horário marcado. Teleconsultor, paciente e médico especialista entram na mesma sala.";
+      ? "Atendimento: no dia e hora marcados, o médico especialista acessa o sistema e abre o link do teleatendimento. A equipe de enfermagem desloca o paciente até a sala de teleparecer e acessa o sistema. O teleatendimento é feito sem a presença do teleconsultor solicitante."
+      : "Teleatendimento síncrono com a presença do paciente, no horário marcado. Teleconsultor, paciente e médico especialista entram na mesma sala.";
     return card(sala ? "PASSOS 7 E 8 DO FLUXOGRAMA" : "PASSO 13 · OPÇÃO 2", "Teleatendimento marcado", t);
   }
   if (c.status === "em_atendimento") return esp
-    ? card("PASSO 13 DO FLUXOGRAMA", "Teleatendimento em andamento", "Ao terminar, registre o desfecho no sistema marcando uma das opções.", `<button class="btn" data-a="p13">Registrar desfecho (passo 13)</button>`)
+    ? card("PASSO 13 DO FLUXOGRAMA", "Teleatendimento em andamento", "Ao terminar, registre o desfecho no sistema marcando uma das opções.", `<button class="btn" data-a="p13">Registrar desfecho</button>`)
     : card("TELEATENDIMENTO", "Em andamento", sala ? "Atendimento na sala de teleparecer, com o paciente e a equipe de enfermagem, sem o teleconsultor solicitante. Use a Troca de informações abaixo para enviar dados ao médico especialista durante o atendimento." : "Entre na sala para participar e use a Troca de informações abaixo para enviar dados ao médico especialista.");
   if (c.status === "respondido") return card("PASSO 12 DO FLUXOGRAMA", "Resposta registrada: encerre o pedido", "O médico especialista assina o documento, a evolução segue para o prontuário (PEC e-SUS) e o pedido é encerrado no sistema de Telessaúde.");
   return "";
@@ -177,7 +177,7 @@ function ligaDetalhe(b, c) {
     assinar: () => modal({ titulo: "Assinatura eletrônica", ok: "Assinar documento", corpo: `<p>O parecer será assinado com certificado digital ICP-Brasil (simulado) e receberá um código verificável.</p><div class="fld"><label>Certificado</label><select id="cert"><option>ICP-Brasil A3 (simulada)</option><option>Gov.br avançada (simulada)</option></select></div>`, onOk: async (m) => { await acao(c, "assinar", { tipo: m.querySelector("#cert").value }); toast("Documento assinado."); } }),
     enviar: () => modal({ titulo: "Anexar as informações solicitadas", ok: "Enviar ao médico especialista", corpo: `<div class="fld"><label>Informações</label><textarea id="t"></textarea></div><div class="fld"><label>Anexos</label><input id="f" type="file" multiple></div>`, onOk: async (m) => { const t = m.querySelector("#t").value.trim(); if (!t) { toast("Descreva as informações.", true); return false; } await acao(c, "enviar_info", { texto: t, anexos: [...m.querySelector("#f").files].map((f) => ({ nome: f.name, tamanho: f.size })) }); toast("Informações enviadas."); } }),
     p11sim: () => {
-      modal({ titulo: "Passo 12 · Emitir parecer e encerrar o pedido", lg: true, ok: "Emitir parecer", corpo: `<div class="f"><div class="pill-info">Opção: <b>Teleparecer resolvido e evoluído no prontuário eletrônico</b></div>${campoTexto("Parecer", "Use o rascunho do Copiloto como ponto de partida. A revisão é obrigatória.", c.resposta ? c.resposta.texto : "")}</div>`,
+      modal({ titulo: "Emitir parecer e encerrar o pedido", lg: true, ok: "Emitir parecer", corpo: `<div class="f"><div class="pill-info">Opção: <b>Teleparecer resolvido e evoluído no prontuário eletrônico</b></div>${campoTexto("Parecer", "Use o rascunho do Copiloto como ponto de partida. A revisão é obrigatória.", c.resposta ? c.resposta.texto : "")}</div>`,
         onOk: async (m) => { const t = m.querySelector("#t").value.trim(); if (t.length < 20) { toast("Escreva o parecer completo.", true); return false; } await acao(c, "responder", { opcao: "resolvido", texto: t }); toast("Parecer emitido. Falta a assinatura eletrônica."); } });
       ligaRascunho();
     },
@@ -189,7 +189,7 @@ function ligaDetalhe(b, c) {
         : op === "sync" ? `<div id="g">${slotGrid(sl, sel)}</div>`
         : op === "hospitalar" ? campoTexto("Orientação ao teleconsultor", "Descreva o encaminhamento pelo fluxo hospitalar já estabelecido.")
         : campoTexto("Evolução no prontuário", "O teleparecer será evoluído no prontuário eletrônico.", c.resposta ? c.resposta.texto : "");
-      const mm = modal({ titulo: "Passo 13 · Responder no Sistema de Telessaúde", lg: true, ok: "Registrar", corpo: `<div class="opcoes13">${OPS.map((o, i) => `<label class="o13"><input type="radio" name="op13" value="${o[0]}" ${i === 0 ? "" : ""}${o[0] === ini ? "checked" : ""}><b>${o[1]}</b><span>${o[2]}</span></label>`).join("")}</div><div id="area13" style="margin-top:14px">${area(ini)}</div>`,
+      const mm = modal({ titulo: "Responder no Sistema de Telessaúde", lg: true, ok: "Registrar", corpo: `<div class="opcoes13">${OPS.map((o, i) => `<label class="o13"><input type="radio" name="op13" value="${o[0]}" ${i === 0 ? "" : ""}${o[0] === ini ? "checked" : ""}><b>${o[1]}</b><span>${o[2]}</span></label>`).join("")}</div><div id="area13" style="margin-top:14px">${area(ini)}</div>`,
         onOk: async (m) => {
           const op = m.querySelector("input[name=op13]:checked").value;
           const t = (m.querySelector("#t") || {}).value?.trim();

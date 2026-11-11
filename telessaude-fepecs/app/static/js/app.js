@@ -7,9 +7,9 @@ import * as O from "./v-outros.js";
 import * as R from "./v-sala.js";
 
 const MENU = {
-  admin: ["painel", "casos", "agenda", "reunioes", "telediagnostico", "suporte", "admin", "integracoes", "fluxo"],
-  solicitante: ["painel", "novo", "casos", "agenda", "reunioes", "telediagnostico", "suporte", "fluxo"],
-  especialista: ["painel", "casos", "agenda", "reunioes", "telediagnostico", "suporte", "fluxo"],
+  admin: ["painel", "casos", "agenda", "reunioes", "telediagnostico", "suporte", "admin", "integracoes"],
+  solicitante: ["painel", "novo", "casos", "agenda", "reunioes", "telediagnostico", "suporte"],
+  especialista: ["painel", "casos", "agenda", "reunioes", "telediagnostico", "suporte"],
 };
 const ITEM = {
   painel: ["Painel", "home"], novo: ["Nova solicitação", "plus"], casos: ["Solicitações", "inbox"], agenda: ["Agenda", "cal"],

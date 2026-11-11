@@ -295,7 +295,7 @@ async def create_case(request):
         hipotese=b.get("hipotese", ""), duvida=b.get("duvida", ""), queixa=b.get("queixa", ""), criado=now(), prazo=now() + 48 * H,
         info_pedida=None, paciente=pac, solicitante=u["id"], especialidade=b.get("especialidade", ""), unidade=u["unidade"])
     if sincrono:
-        add_event(c, u, "criacao", f"Teleparecer solicitado ao serviço de {c['especialidade']}: paciente pode ser deslocado à sala de teleparecer (passo 6).")
+        add_event(c, u, "criacao", f"Teleparecer solicitado ao serviço de {c['especialidade']}: paciente pode ser deslocado à sala de teleparecer.")
         s = next((x for x in DB["slots"] if x["id"] == b["slot"] and x["status"] == "livre"), None)
         if not s:
             return jr({"erro": "Horário indisponível."}, 409)
@@ -303,9 +303,9 @@ async def create_case(request):
         c["especialista"] = s["especialista"]
         c["status"] = "teleatendimento_agendado"
         c["agendamento"] = dict(inicio=s["inicio"], fim=s["fim"], slot=s["id"])
-        add_event(c, u, "agenda", "Agenda de teleconsulta hospitalar solicitada com o especialista (passo 7).")
+        add_event(c, u, "agenda", "Agenda de teleconsulta hospitalar solicitada com o especialista.")
     else:
-        origem = "paciente não pode ser deslocado à sala (passo 6), segue para análise" if b.get("sem_deslocamento") else "teleconsultoria assíncrona (passos 5 e 9)"
+        origem = "paciente não pode ser deslocado à sala, segue para análise" if b.get("sem_deslocamento") else "teleconsultoria assíncrona"
         add_event(c, u, "criacao", f"Teleparecer solicitado ao serviço de {c['especialidade']}: {origem}. Prazo de resposta: 48 h.")
     DB["cases"].insert(0, c)
     audit(u, "Criação de " + tipo, c["protocolo"], request)
@@ -348,14 +348,14 @@ async def case_action(request):
     elif act == "assumir":
         c["especialista"] = u["id"]
         c["status"] = "em_analise"
-        add_event(c, u, "analise", "Solicitação analisada pelo médico especialista (passo 10).")
+        add_event(c, u, "analise", "Solicitação analisada pelo médico especialista.")
         pend = [c["solicitante"]]
     elif act == "solicitar_info":
         c["status"] = "info_solicitada"
         c["info_pedida"] = b.get("texto", "")
         c["mensagens"].append(dict(ts=now(), autor=u["id"], texto="Solicito mais informações: " + c["info_pedida"], anexos=[]))
         c["especialista"] = c["especialista"] or u["id"]
-        add_event(c, u, "info", "Opção 1: solicito mais informações: " + c["info_pedida"])
+        add_event(c, u, "info",         "Solicito mais informações: " + c["info_pedida"])
         pend = [c["solicitante"]]
     elif act == "enviar_info":
         c["status"] = "em_analise"
@@ -373,12 +373,12 @@ async def case_action(request):
         c["modo"] = "a_beira_leito"
         c["status"] = "teleatendimento_agendado"
         c["agendamento"] = dict(inicio=s["inicio"], fim=s["fim"], slot=s["id"])
-        add_event(c, u, "agenda", "Opção 2: favor marcar teleatendimento síncrono com a presença do paciente.")
-        c["mensagens"].append(dict(ts=now(), autor=u["id"], texto="Opção 2: favor marcar teleatendimento síncrono com a presença do paciente, em " + s["inicio"][:16].replace("T", " às ") + ".", anexos=[]))
+        add_event(c, u, "agenda", "Teleatendimento síncrono com a presença do paciente solicitado.")
+        c["mensagens"].append(dict(ts=now(), autor=u["id"], texto="Favor marcar teleatendimento síncrono com a presença do paciente, em " + s["inicio"][:16].replace("T", " às ") + ".", anexos=[]))
         pend = [c["solicitante"], c["especialista"]]
     elif act == "iniciar_atendimento":
         c["status"] = "em_atendimento"
-        add_event(c, u, "atendimento", "Teleatendimento iniciado (passo 8).")
+        add_event(c, u, "atendimento", "Teleatendimento iniciado.")
         pend = [x for x in (c["solicitante"], c["especialista"]) if x and x != u["id"]]
     elif act == "salvar_transcricao":
         c["transcricao"] = b.get("linhas", [])
@@ -387,8 +387,8 @@ async def case_action(request):
         op = b.get("opcao", "resolvido")
         c["resposta"] = dict(opcao=op, texto=b.get("texto", ""), por=u["id"], ts=now(), assinatura=None)
         c["especialista"] = c["especialista"] or u["id"]
-        rotulos = dict(resolvido="Teleparecer resolvido e evoluído no prontuário eletrônico (passo 12)", hospitalar="Opção 3: seguir fluxo hospitalar já estabelecido",
-                       evoluir="Opção 4: evoluir teleparecer no prontuário")
+        rotulos = dict(resolvido="Teleparecer resolvido e evoluído no prontuário eletrônico", hospitalar="Seguir fluxo hospitalar já estabelecido",
+                       evoluir="Evoluir teleparecer no prontuário")
         c["status"] = "respondido"
         add_event(c, u, "resposta", f"Resposta registrada: {rotulos.get(op, op)}.")
         c["mensagens"].append(dict(ts=now(), autor=u["id"], texto=f"{rotulos.get(op, op)}: {b.get('texto', '')}", anexos=[]))
